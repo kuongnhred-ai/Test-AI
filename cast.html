@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Creation Interface - Final Fixed</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-color: #121216; 
+			--sidebar-bg: #1a1a20; 
+			--card-bg: #25252b;
+            --accent-yellow: #f8d448; 
+			--text-main: #ffffff; 
+			--text-dim: #a0a0a5;
+            --border-color: #33333a;
+        }
+			
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background-color: var(--bg-color); color: var(--text-main); font-family: 'Inter', sans-serif; overflow-x: hidden; }
+
+        /* --- HEADER (FIXED FROM CONTENT.HTML) --- */
+         body {
+            margin: 0;
+            background-color: var(--bg-color);
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* --- CSS HEADER --- */
+        header { 
+            background: #18181d; 
+            border-bottom: 1px solid var(--border-color);
+            padding: 10px 25px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            color: var(--text-main);
+        }
+
+        /* Phần bên trái: Project Name */
+        .header-top-left { 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+            flex: 1; 
+        }
+        .project-name-wrapper { 
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+        }
+        .project-input { 
+            background: transparent; 
+            border: none; 
+            color: white; 
+            font-weight: bold; 
+            font-size: 16px; 
+            outline: none; 
+            width: auto; 
+            max-width: 150px;
+            border-bottom: 1px solid transparent;
+            transition: border-color 0.3s;
+        }
+        /* Style khi đang sửa tên */
+        .project-input:not([readonly]) { 
+            border-bottom: 1px solid var(--accent-yellow); 
+            background: #222; 
+        }
+
+        /* Phần giữa: Stepper Nav */
+        .stepper-nav { 
+            display: flex; 
+            align-items: center; 
+            gap: 0; 
+            flex: 2; 
+            justify-content: center; 
+        }
+        .step-node { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            position: relative; 
+            width: 80px; 
+            z-index: 2; 
+        }
+        .step-node i { 
+            font-size: 20px; 
+            color: var(--text-dim); 
+            margin-bottom: 6px; 
+        }
+        .step-node span { 
+            font-size: 10px; 
+            color: var(--text-dim); 
+            text-transform: uppercase; 
+            font-weight: 600; 
+        }
+        .step-node.active i, 
+        .step-node.active span { 
+            color: var(--accent-yellow); 
+        }
+        
+        .step-connector { 
+            height: 1px; 
+            background: #444; 
+            flex-grow: 1; 
+            max-width: 60px; 
+            margin-bottom: 18px; 
+            z-index: 1; 
+        }
+        .step-connector.active { 
+            background: var(--accent-yellow); 
+        }
+
+        /* Phần bên phải: User Info */
+        .header-top-right { 
+            display: flex; 
+            align-items: center; 
+            gap: 20px; 
+            flex: 1; 
+            justify-content: flex-end; 
+        }
+        .coin-status { 
+            color: var(--accent-yellow); 
+            font-weight: bold; 
+            display: flex; 
+            align-items: center; 
+            gap: 5px; 
+            font-size: 14px; 
+        }
+        .user-info { 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+        }
+        .user-info img { 
+            width: 32px; 
+            height: 32px; 
+            border-radius: 50%; 
+            border: 1px solid #444; 
+        }
+
+        /* --- RESPONSIVE CHO MOBILE --- */
+        @media (max-width: 992px) {
+            header { 
+                flex-wrap: wrap; 
+                padding: 10px;
+            }
+            .header-top-left { order: 1; flex: 1; }
+            .header-top-right { order: 2; flex: 1; }
+            .stepper-nav { 
+                order: 3; 
+                width: 100%; 
+                flex: none; 
+                margin-top: 15px; 
+                padding-top: 10px; 
+                border-top: 1px solid var(--border-color);
+                justify-content: space-evenly;
+            }
+            .step-connector { max-width: 40px; }
+        }
+
+        /* --- CONTAINER --- */
+        .container { max-width: 1200px; margin: 20px auto; padding: 0 15px 100px 15px; }
+        .auto-box { background: rgba(248, 212, 72, 0.05); border: 1px dashed var(--accent-yellow); padding: 15px; border-radius: 12px; margin-bottom: 25px; }
+
+        /* --- CARDS --- */
+        .char-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
+        .char-card { background: var(--card-bg); border-radius: 12px; overflow: hidden; border: 2px solid transparent; position: relative; cursor: pointer; transition: 0.2s; }
+        .char-card.selected { border-color: var(--blue-glow); border: 2px solid #0095ff; background: #1e2836; }
+        .char-card img { width: 100%; height: 280px; object-fit: cover; display: block; }
+        .char-info { padding: 15px; }
+        .voice-tag { font-size: 12px; color: var(--text-dim); display: flex; align-items: center; gap: 5px; margin-top: 6px; }
+
+        /* --- LIBRARY SECTION --- */
+        .library-section { display: none; }
+        .library-layout { display: grid; grid-template-columns: 350px 1fr; gap: 30px; }
+        @media (max-width: 992px) { .library-layout { grid-template-columns: 1fr; } .lib-preview-col { position: static !important; } }
+
+        .lib-preview-col { background: var(--sidebar-bg); padding: 20px; border-radius: 15px; border: 1px solid var(--border-color); height: fit-content; position: sticky; top: 84px; }
+        .preview-box { width: 100%; height: 300px; background: #000; border-radius: 10px; display: flex; align-items: center; justify-content: center; position: relative; margin-bottom: 15px; overflow: hidden; }
+        .preview-box img { width: 100%; height: 100%; object-fit: cover; display: none; }
+        .edit-overlay { position: absolute; bottom: 10px; right: 10px; background: var(--accent-yellow); color: #000; width: 32px; height: 32px; border-radius: 50%; display: none; align-items: center; justify-content: center; cursor: pointer; z-index: 5; }
+
+        .lib-input { width: 100%; background: #111; border: 1px solid #444; color: #fff; padding: 10px; border-radius: 6px; margin-bottom: 10px; outline: none; font-size: 13px; }
+        .lib-label { font-size: 11px; color: var(--text-dim); margin-bottom: 4px; display: block; }
+
+        /* --- FILTERS & GRID --- */
+        .filter-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+        .tab-group { display: flex; gap: 15px; border-right: 1px solid #333; padding-right: 15px; }
+        .tab-item { cursor: pointer; font-size: 13px; color: var(--text-dim); }
+        .tab-item.active { color: var(--accent-yellow); font-weight: bold; }
+
+        .lib-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; }
+        .lib-item { border-radius: 10px; overflow: hidden; border: 2px solid transparent; height: 160px; position: relative; cursor: pointer; }
+        .lib-item img { width: 100%; height: 100%; object-fit: cover; }
+        .lib-item.active { border-color: var(--accent-yellow); }
+        .lib-item.used { opacity: 0.25; filter: grayscale(1); pointer-events: none; }
+        .lib-item.used::after { content: "USED"; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #ff4444; color: white; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; }
+
+        /* --- MENU ICON --- */
+        .more-dots { position: absolute; top: 6px; right: 6px; background: rgba(0,0,0,0.6); color: white; width: 24px; height: 24px; border-radius: 4px; display: flex; align-items: center; justify-content: center; z-index: 10; }
+        .ctx-menu { position: absolute; top: 35px; right: 6px; background: #2a2a30; border-radius: 4px; display: none; z-index: 100; min-width: 100px; border: 1px solid #444; }
+        .ctx-menu div { padding: 10px 12px; font-size: 12px; border-bottom: 1px solid #333; cursor: pointer; color: #eee; }
+        .ctx-menu div:hover { background: #333; color: var(--accent-yellow); }
+
+        /* --- MODAL --- */
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 2000; padding: 20px; }
+        .modal-content { background: var(--sidebar-bg); padding: 30px; border-radius: 15px; width: 100%; max-width: 500px; border: 1px solid #444; position: relative; }
+        #c-prompt { height: 100px; transition: height 0.3s ease; resize: none; }
+        #c-prompt.expanded { height: 300px; }
+
+        /* --- FOOTER --- */
+        footer { position: fixed; bottom: 0; width: 100%; background: #18181d; padding: 15px 40px; border-top: 1px solid var(--border-color); display: flex; justify-content: flex-end; gap: 15px; }
+        .btn { padding: 10px 25px; border-radius: 6px; border: none; font-weight: bold; cursor: pointer; transition: 0.2s; font-size: 14px; }
+        .btn-yellow { background: var(--accent-yellow); color: #000; opacity: 0.4; pointer-events: none; }
+        .btn-yellow.enabled { opacity: 1; pointer-events: auto; }
+        .btn-outline { background: #333; color: #fff; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-top-left">
+            <i class="fa-solid fa-chevron-left" style="cursor: pointer;"></i>
+            <div class="project-name-wrapper">
+                <input type="text" id="prj-title" class="project-input" value="Draft project" readonly>
+                <i class="fa-solid fa-pen-to-square" style="cursor:pointer; font-size:13px; color:#888;" onclick="toggleEditProject()"></i>
+            </div>
+        </div>
+
+        <nav class="stepper-nav">
+            <div class="step-node"><i class="fa-solid fa-file-lines"></i><span>Content</span></div>
+            <div class="step-connector active"></div>
+            <div class="step-node active"><i class="fa-solid fa-user-check"></i><span>Cast</span></div>
+            <div class="step-connector"></div>
+            <div class="step-node"><i class="fa-solid fa-film"></i><span>Storyboard</span></div>
+            <div class="step-connector"></div>
+            <div class="step-node"><i class="fa-solid fa-sliders"></i><span>Edit</span></div>
+        </nav>
+
+        <div class="header-top-right">
+            <div class="coin-status"><i class="fa-solid fa-coins"></i><span>70</span></div>
+            <div class="user-info">
+                <span>Username</span>
+                <img src="https://i.pravatar.cc/100" alt="avatar">
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <div id="main-view">
+            <div class="auto-box">
+                <h3 style="color:var(--accent-yellow);">Auto – detect 3 Characters</h3>
+                <p style="font-size:12px; color:var(--text-dim); margin-top:5px;">Click the card below to edit the character</p>
+            </div>
+            <div class="char-grid" id="main-grid">
+                <div class="char-card" onclick="selectCard(this)" data-lib-id="lib-demo-1">
+                    <div class="more-dots" onclick="toggleCtx(event, this)"><i class="fa-solid fa-ellipsis"></i></div>
+                    <div class="ctx-menu">
+                        <div onclick="editHomeCard(this)">Edit</div>
+                        <div onclick="deleteHomeCard(this)">Delete</div>
+                    </div>
+                    <img src="https://tse1.mm.bing.net/th/id/OIP.xesILtDlRn_6aWlmlPIK6AHaHa?rs=1&pid=ImgDetMain&o=7&rm=3">
+                    <div class="char-info">
+                        <b>Manager</b><br><small>Male | Child</small>
+                        <div class="voice-tag"><i class="fa-solid fa-volume-high"></i> William</div>
+                    </div>
+                </div>
+                <div class="char-card" style="border: 2px dashed #444; display:flex; flex-direction:column; align-items:center; justify-content:center; height:375px;" onclick="goToLib()">
+                    <i class="fa-solid fa-plus" style="font-size:30px; margin-bottom:10px; color: #666;"></i>
+                    <span style="color: #888;">More Character</span>
+                </div>
+            </div>
+			
+        </div>
+
+        <div id="lib-view" class="library-section">
+            <h2 style="color:var(--accent-yellow); margin-bottom:20px;">Character Library</h2>
+            <div class="library-layout">
+                <aside class="lib-preview-col">
+                    <div class="preview-box" id="p-box">
+                        <i class="fa-solid fa-image" style="font-size:40px; color:#222;"></i>
+                        <img id="review-img" src="">
+                        <div id="overlay-edit" class="edit-overlay" onclick="openCreateModal()"><i class="fa-solid fa-pen"></i></div>
+                    </div>
+                    <label class="lib-label">Name</label>
+                    <input type="text" id="v-name" class="lib-input" placeholder="Character name...">
+                    <label class="lib-label">Voiceover</label>
+                    <select class="lib-input"><option>William</option></select>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                        <div><label class="lib-label">Gender</label><select class="lib-input"><option>Male</option></select></div>
+                        <div><label class="lib-label">Age</label><select class="lib-input" id="v-age"><option>Adult</option><option>Child</option></select></div>
+                    </div>
+                    <button id="lib-confirm-btn" class="btn btn-yellow" style="width:100%; margin-top:10px;" onclick="confirmToHome()">Confirm</button>
+                </aside>
+
+                <section>
+                    <div class="filter-header">
+                        <div class="tab-group">
+                            <span class="tab-item active">All</span>
+                            <span class="tab-item">Recent</span>
+                            <span class="tab-item">My character</span>
+                        </div>
+                        <select class="lib-input" style="width:100px; margin-bottom:0;"><option>Gender</option></select>
+                        <select class="lib-input" style="width:100px; margin-bottom:0;"><option>Age</option></select>
+                        <div class="search-box" style="flex:1; position:relative;">
+                            <input type="text" class="lib-input" style="margin-bottom:0;" placeholder="Search...">
+                        </div>
+                    </div>
+                    <div class="lib-grid" id="lib-grid">
+                        <div class="lib-item" style="border: 2px dashed #444; display:flex; flex-direction:column; align-items:center; justify-content:center; color:#555;" onclick="openCreateModal()">
+                            <i class="fa-solid fa-plus"></i><br><span style="font-size:12px;">Create</span>
+                        </div>
+                        <div class="lib-item" id="lib-demo-1" onclick="selectLibItem(this, 'Manager', 'https://img.freepik.com/premium-photo/fantasy-medieval-character-roleplay-larp-figure-heros-fantasy-world-dungeon_961179-1834.jpg')">
+                            <div class="more-dots" onclick="toggleCtx(event, this)"><i class="fa-solid fa-ellipsis"></i></div>
+                            <div class="ctx-menu"><div>Edit</div><div onclick="this.closest('.lib-item').remove()">Delete</div></div>
+                            <img src="https://img.freepik.com/premium-photo/fantasy-medieval-character-roleplay-larp-figure-heros-fantasy-world-dungeon_961179-1834.jpg">
+                        </div>
+						<div class="lib-item" id="lib-demo-2" onclick="selectLibItem(this, 'Manager', 'https://tse2.mm.bing.net/th/id/OIP.vIGA8lWVdf9tkcHo5AZycgHaK0?rs=1&pid=ImgDetMain&o=7&rm=3')">
+                            <div class="more-dots" onclick="toggleCtx(event, this)"><i class="fa-solid fa-ellipsis"></i></div>
+                            <div class="ctx-menu"><div>Edit</div><div onclick="this.closest('.lib-item').remove()">Delete</div></div>
+                            <img src="https://tse2.mm.bing.net/th/id/OIP.vIGA8lWVdf9tkcHo5AZycgHaK0?rs=1&pid=ImgDetMain&o=7&rm=3">
+                        </div>
+						<div class="lib-item" id="lib-demo-3" onclick="selectLibItem(this, 'Manager', 'https://img.freepik.com/premium-photo/beautiful-young-woman-realistic-anime-pencil_553012-70144.jpg')">
+                            <div class="more-dots" onclick="toggleCtx(event, this)"><i class="fa-solid fa-ellipsis"></i></div>
+                            <div class="ctx-menu"><div>Edit</div><div onclick="this.closest('.lib-item').remove()">Delete</div></div>
+                            <img src="https://img.freepik.com/premium-photo/beautiful-young-woman-realistic-anime-pencil_553012-70144.jpg">
+                        </div>
+						<div class="lib-item" id="lib-demo-4" onclick="selectLibItem(this, 'Manager', 'https://tse1.mm.bing.net/th/id/OIP.AnkEoBL0mb-9TjRwa9CtPAHaJo?w=640&h=832&rs=1&pid=ImgDetMain&o=7&rm=3')">
+                            <div class="more-dots" onclick="toggleCtx(event, this)"><i class="fa-solid fa-ellipsis"></i></div>
+                            <div class="ctx-menu"><div>Edit</div><div onclick="this.closest('.lib-item').remove()">Delete</div></div>
+                            <img src="https://tse1.mm.bing.net/th/id/OIP.AnkEoBL0mb-9TjRwa9CtPAHaJo?w=640&h=832&rs=1&pid=ImgDetMain&o=7&rm=3">
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <div id="create-modal" class="modal">
+        <div class="modal-content">
+            <i class="fa-solid fa-xmark" style="position:absolute; top:15px; right:20px; cursor:pointer;" onclick="closeCreateModal()"></i>
+            <h2 style="color:var(--accent-yellow); margin-bottom:20px; font-size:18px;">Create Character</h2>
+            
+            <label class="lib-label">Name</label>
+            <input type="text" id="c-name" class="lib-input" placeholder="Enter character name..." oninput="validateGenerate()">
+            
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
+                <label class="lib-label" style="margin-bottom:0;">Character Prompt</label>
+                <button type="button" onclick="toggleAllExpand()" style="background:#333; color:var(--accent-yellow); border:none; padding:3px 10px; font-size:10px; border-radius:4px; cursor:pointer;">All Expand</button>
+            </div>
+            <textarea id="c-prompt" class="lib-input" placeholder="Describe the character look, clothing, etc..." oninput="validateGenerate()"></textarea>
+            <div style="text-align:right; font-size:10px; color:#666; margin-top:-8px; margin-bottom:15px;">0/3500</div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                <input type="file" id="f-upload" style="display:none;" onchange="handleDesktopFile(event)">
+                <button type="button" style="background:none; border:none; color:var(--accent-yellow); font-size:12px; cursor:pointer;" onclick="document.getElementById('f-upload').click()"><i class="fa-solid fa-upload"></i> Load Images</button>
+                <span id="f-status" style="font-size:10px; color:#555;">No image selected</span>
+            </div>
+            <button id="btn-generate" class="btn btn-yellow" style="width:100%;" onclick="executeGenerate()">Generate</button>
+        </div>
+    </div>
+
+    <footer>
+        <button id="btn-back" class="btn btn-outline" onclick="goBack()">Back</button>
+        <button id="btn-next" class="btn btn-yellow" onclick="handleFinalNext()">Next</button>
+    </footer>
+
+    <script>
+        let currentLibSelection = null;
+        let desktopImageData = null;
+
+        function enableTitleEdit() { const i = document.getElementById('prj-title'); i.removeAttribute('readonly'); i.focus(); }
+        
+        function goToLib() { 
+            document.getElementById('main-view').style.display='none'; 
+            document.getElementById('lib-view').style.display='block'; 
+        }
+
+        /* --- CẬP NHẬT NÚT BACK --- */
+        function goBack() { 
+            // Nếu đang ở Library view thì quay về Main view của Cast
+            if(document.getElementById('lib-view').style.display === 'block') {
+                document.getElementById('main-view').style.display='block'; 
+                document.getElementById('lib-view').style.display='none'; 
+            } else {
+                // Nếu đang ở Main view của Cast, click Back sẽ quay về Synopsis của trang Content
+                // Giả sử file content là index.html
+                window.location.href = 'index.html'; 
+            }
+        }
+
+        function openCreateModal() { document.getElementById('create-modal').style.display='flex'; }
+        function closeCreateModal() { document.getElementById('create-modal').style.display='none'; resetCreateForm(); }
+
+        /* --- CẬP NHẬT LOGIC CHỌN CARD & NÚT NEXT --- */
+        function selectCard(el) { 
+            document.querySelectorAll('.char-card').forEach(c=>c.classList.remove('selected')); 
+            el.classList.add('selected'); 
+            
+            // Khi chọn bất kỳ card nhân vật nào, nút Next sẽ sáng lên
+            document.getElementById('btn-next').classList.add('enabled');
+        }
+
+        function handleFinalNext() {
+            // Chuyển sang storyboard.html
+            window.location.href = 'storyboad.html';
+        }
+
+        function toggleCtx(e, btn) { e.stopPropagation(); document.querySelectorAll('.ctx-menu').forEach(m=>m.style.display='none'); btn.nextElementSibling.style.display='block'; }
+
+        function deleteHomeCard(btn) {
+            const card = btn.closest('.char-card');
+            const libId = card.getAttribute('data-lib-id');
+            if(libId) {
+                const libItem = document.getElementById(libId);
+                if(libItem) libItem.classList.remove('used');
+            }
+            card.remove();
+            
+            // Kiểm tra xem còn card nào đang được chọn không, nếu không thì tắt nút Next
+            const selected = document.querySelector('.char-card.selected');
+            if(!selected) document.getElementById('btn-next').classList.remove('enabled');
+        }
+
+        function editHomeCard(btn) {
+            const card = btn.closest('.char-card');
+            document.getElementById('c-name').value = card.querySelector('b').innerText;
+            openCreateModal();
+        }
+
+        // Logic Library
+        function selectLibItem(el, name, url) {
+            if(el.classList.contains('used')) return;
+            document.querySelectorAll('.lib-item').forEach(i=>i.classList.remove('active'));
+            el.classList.add('active');
+            
+            const rImg = document.getElementById('review-img');
+            rImg.src = url; rImg.style.display = 'block';
+            document.querySelector('#p-box i').style.display = 'none';
+            document.getElementById('overlay-edit').style.display = 'flex';
+            document.getElementById('v-name').value = name;
+            document.getElementById('lib-confirm-btn').classList.add('enabled');
+            currentLibSelection = { id: el.id, name, url, element: el };
+        }
+
+        // Logic All Expand
+        function toggleAllExpand() {
+            document.getElementById('c-prompt').classList.toggle('expanded');
+        }
+
+        // Logic Create & Desktop File
+        function validateGenerate() {
+            const n = document.getElementById('c-name').value.trim();
+            const p = document.getElementById('c-prompt').value.trim();
+            const b = document.getElementById('btn-generate');
+            if(desktopImageData || (n !== "" && p !== "")) b.classList.add('enabled'); else b.classList.remove('enabled');
+        }
+
+        function handleDesktopFile(e) {
+            const file = e.target.files[0];
+            if(file) {
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    desktopImageData = ev.target.result;
+                    document.getElementById('f-status').innerText = "Desktop image ready";
+                    validateGenerate();
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function executeGenerate() {
+            const name = document.getElementById('c-name').value || "New Character";
+            const img = desktopImageData || `https://picsum.photos/400/400?random=${Math.random()}`;
+            const id = "lib-item-" + Date.now();
+
+            const item = document.createElement('div');
+            item.className = 'lib-item'; item.id = id;
+            item.onclick = function() { selectLibItem(this, name, img); };
+            item.innerHTML = `
+                <div class="more-dots" onclick="toggleCtx(event, this)"><i class="fa-solid fa-ellipsis"></i></div>
+                <div class="ctx-menu"><div>Edit</div><div onclick="this.closest('.lib-item').remove()">Delete</div></div>
+                <img src="${img}">`;
+            document.getElementById('lib-grid').appendChild(item);
+            selectLibItem(item, name, img);
+            closeCreateModal();
+        }
+
+        function resetCreateForm() {
+            document.getElementById('c-name').value = ""; document.getElementById('c-prompt').value = "";
+            document.getElementById('c-prompt').classList.remove('expanded');
+            desktopImageData = null; document.getElementById('f-status').innerText = "No image selected";
+            document.getElementById('btn-generate').classList.remove('enabled');
+        }
+
+        function confirmToHome() {
+            if(!currentLibSelection) return;
+            currentLibSelection.element.classList.add('used');
+
+            const card = document.createElement('div');
+            card.className = 'char-card'; card.setAttribute('data-lib-id', currentLibSelection.id);
+            card.onclick = function() { selectCard(this); };
+            card.innerHTML = `
+                <div class="more-dots" onclick="toggleCtx(event, this)"><i class="fa-solid fa-ellipsis"></i></div>
+                <div class="ctx-menu"><div onclick="editHomeCard(this)">Edit</div><div onclick="deleteHomeCard(this)">Delete</div></div>
+                <img src="${currentLibSelection.url}">
+                <div class="char-info">
+                    <b>${currentLibSelection.name}</b><br><small>Male | ${document.getElementById('v-age').value}</small>
+                    <div class="voice-tag"><i class="fa-solid fa-volume-high"></i> William</div>
+                </div>`;
+            const grid = document.getElementById('main-grid');
+            grid.insertBefore(card, grid.lastElementChild);
+            goBack();
+        }
+
+        window.onclick = () => document.querySelectorAll('.ctx-menu').forEach(m=>m.style.display='none');
+    </script>
+	<script>
+        /**
+         * Hàm xử lý bật/tắt chế độ sửa tên dự án
+         */
+        function toggleEditProject() {
+            const input = document.getElementById('prj-title');
+            
+            // Nếu đang ở chế độ chỉ đọc, thì mở khóa để sửa
+            if (input.hasAttribute('readonly')) {
+                input.removeAttribute('readonly');
+                input.focus();
+                input.select(); // Bôi đen toàn bộ để người dùng dễ thay thế tên cũ
+                
+                // Khi người dùng click ra ngoài (blur) thì tự động khóa lại
+                input.onblur = function() { 
+                    input.setAttribute('readonly', 'true'); 
+                };
+                
+                // Khi nhấn phím Enter thì cũng hoàn tất việc chỉnh sửa
+                input.onkeydown = function(e) { 
+                    if(e.key === 'Enter') input.blur(); 
+                };
+            }
+        }
+    </script>
+</body>
+</html>

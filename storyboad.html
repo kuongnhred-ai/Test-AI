@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-color: #121216;
+            --sidebar-bg: #1a1a20;
+            --accent-yellow: #f8d448;
+            --text-main: #ffffff;
+            --text-dim: #a0a0a5;
+            --border-color: #33333a;
+            --card-bg: #1e1e24;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background-color: var(--bg-color); color: var(--text-main); font-family: 'Inter', sans-serif; overflow-x: hidden; }
+
+        /* --- CSS HEADER --- */
+        header { 
+            background: #18181d; 
+            border-bottom: 1px solid var(--border-color);
+            padding: 10px 25px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            color: var(--text-main);
+        }
+
+        /* Phần bên trái: Project Name */
+        .header-top-left { 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+            flex: 1; 
+        }
+        .project-name-wrapper { 
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+        }
+        .project-input { 
+            background: transparent; 
+            border: none; 
+            color: white; 
+            font-weight: bold; 
+            font-size: 16px; 
+            outline: none; 
+            width: auto; 
+            max-width: 150px;
+            border-bottom: 1px solid transparent;
+            transition: border-color 0.3s;
+        }
+        /* Style khi đang sửa tên */
+        .project-input:not([readonly]) { 
+            border-bottom: 1px solid var(--accent-yellow); 
+            background: #222; 
+        }
+
+        .stepper-nav { 
+            display: flex; 
+            align-items: center; 
+            gap: 0; 
+            flex: 2; 
+            justify-content: center; 
+        }
+        .step-node { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            position: relative; 
+            width: 80px; 
+            z-index: 2; 
+        }
+        .step-node i { font-size: 20px; color: var(--text-dim); margin-bottom: 6px; }
+        .step-node span { font-size: 10px; color: var(--text-dim); text-transform: uppercase; font-weight: 600; }
+        .step-node.active i, .step-node.active span { color: var(--accent-yellow); }
+        
+        .step-connector { height: 1px; background: #444; flex-grow: 1; max-width: 60px; margin-bottom: 18px; z-index: 1; }
+        .step-connector.active { background: var(--accent-yellow); }
+
+        .header-top-right { 
+            display: flex; 
+            align-items: center; 
+            gap: 15px; 
+            flex: 1; 
+            justify-content: flex-end; 
+            min-width: fit-content;
+        }
+        .coin-status { color: var(--accent-yellow); font-weight: bold; display: flex; align-items: center; gap: 5px; font-size: 14px; }
+        .user-info { display: flex; align-items: center; gap: 10px; }
+        .user-info img { width: 32px; height: 32px; border-radius: 50%; border: 1px solid #444; }
+
+        @media (max-width: 992px) {
+            header { padding: 10px 15px; flex-wrap: wrap; }
+            .header-top-left { order: 1; flex: 1; }
+            .header-top-right { order: 2; flex: 1; }
+            .stepper-nav { 
+                order: 3; width: 100%; flex: none; margin-top: 10px; padding-top: 10px; 
+                border-top: 1px solid var(--border-color); justify-content: space-evenly;
+            }
+            .step-connector { max-width: 30px; }
+        }
+		
+        /* --- LAYOUT CHÍNH --- */
+        .main-container { 
+            display: grid; grid-template-columns: 320px 1fr 320px; 
+            height: calc(100vh - 145px); gap: 15px; padding: 15px; box-sizing: border-box; 
+        }
+
+        @media (max-width: 1150px) {
+            .main-container { display: flex; flex-direction: column; height: auto; padding-bottom: 100px; }
+            .center-panel { order: 1; } 
+            .left-panel { order: 2; }   
+            .right-panel { order: 3; }  
+        }
+
+        /* --- CỘT TRÁI --- */
+        .left-panel { background: var(--sidebar-bg); border-radius: 12px; padding: 15px; display: flex; flex-direction: column; gap: 12px; overflow: hidden; }
+        .control-group { display: flex; flex-direction: column; gap: 5px; }
+        .label-sm { font-size: 11px; color: var(--text-dim); text-transform: uppercase; font-weight: bold; }
+        .speed-ctrl { display: flex; align-items: center; background: var(--card-bg); border-radius: 6px; padding: 8px; justify-content: space-between; border: 1px solid var(--border-color); }
+        .speed-btn { background: none; border: none; color: white; cursor: pointer; }
+        .voice-sel { width: 100%; background: var(--card-bg); color: white; border: 1px solid var(--border-color); padding: 10px; border-radius: 6px; font-size: 13px; }
+        .story-list-container { flex-grow: 1; display: flex; flex-direction: column; align-items: center; overflow: hidden; height: 100%; }
+        .nav-btn-v { background: #25252b; color: var(--text-dim); border: 1px solid var(--border-color); width: 100%; padding: 8px; border-radius: 6px; cursor: pointer; text-align: center; }
+        .story-scroll { overflow-y: hidden; display: flex; flex-direction: column; gap: 15px; scroll-behavior: smooth; width: 100%; height: 500px; margin: 10px 0; }
+        .story-card { position: relative; border: 2px solid transparent; border-radius: 10px; overflow: hidden; cursor: pointer; opacity: 0.6; flex-shrink: 0; height: 155px; transition: 0.3s; }
+        .story-card.active { border-color: var(--accent-yellow); opacity: 1; }
+        .story-card img { width: 100%; height: 100%; object-fit: cover; }
+        .scene-label { position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.7); padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; }
+        .btn-more-story { position: absolute; top: 10px; right: 10px; color: white; background: rgba(0,0,0,0.6); width: 24px; height: 24px; border-radius: 4px; display: flex; align-items: center; justify-content: center; z-index: 5; }
+        .story-options-menu { display: none; position: absolute; top: 35px; right: 10px; background: #25252b; border: 1px solid #444; border-radius: 6px; padding: 5px; z-index: 100; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        .story-options-menu i { padding: 8px; font-size: 14px; color: var(--text-dim); cursor: pointer; }
+
+        /* --- CỘT GIỮA --- */
+        .center-panel { display: flex; flex-direction: column; gap: 15px; }
+        .review-frame { 
+            position: relative; background: #000; border-radius: 15px; 
+            min-height: 400px; height: 450px; /* Cố định chiều cao hoặc min-height */
+            display: flex; align-items: center; justify-content: center; 
+            border: 1px solid var(--border-color); overflow: hidden; 
+        }
+        #main-view-img { 
+            max-width: 100%; 
+            max-height: 100%; 
+            object-fit: contain; /* Ảnh to không làm xô lệch khung */
+            display: block;
+        }
+        .btn-edit-main { position: absolute; top: 20px; right: 20px; background: rgba(0,0,0,0.7); padding: 8px 18px; border-radius: 20px; cursor: pointer; font-size: 13px; border: 1px solid #555; display: flex; align-items: center; gap: 8px; z-index: 10; color: white;}
+        .edit-popup { display: none; position: absolute; top: 60px; right: 20px; background: #1a1a20; border: 1px solid #444; border-radius: 10px; padding: 10px; width: 180px; z-index: 20; }
+        .edit-option { display: flex; align-items: center; gap: 10px; padding: 10px; font-size: 13px; color: var(--text-dim); cursor: pointer; border-radius: 6px; }
+        .edit-option:hover { background: #25252b; color: white; }
+
+        .text-box { background: var(--sidebar-bg); padding: 15px; border-radius: 12px; font-size: 14px; border: 1px solid var(--border-color); min-height: 50px; }
+
+        .gen-history-wrap { background: var(--sidebar-bg); padding: 15px; border-radius: 12px; border: 1px solid var(--border-color); }
+        .history-list { display: flex; gap: 10px; overflow-x: auto; align-items: center; padding-bottom: 5px; }
+        .h-img { min-width: 100px; height: 65px; object-fit: cover; border-radius: 8px; opacity: 0.4; cursor: pointer; border: 2px solid transparent; }
+        .h-img.active { opacity: 1; border-color: var(--accent-yellow); }
+        .upload-inline-btn { min-width: 100px; height: 65px; border: 1px dashed #555; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--card-bg); cursor: pointer; color: var(--text-dim); }
+
+       /* --- CỘT PHẢI --- */
+        .right-panel { background: var(--sidebar-bg); border-radius: 12px; padding: 15px; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 15px; }
+        .section-header { display: flex; justify-content: space-between; align-items: center; }
+        .btn-link { background: none; border: none; color: var(--accent-yellow); font-size: 11px; cursor: pointer; padding: 0; }
+        
+        .prompt-area-wrap { background: var(--card-bg); border-radius: 10px; padding: 12px; border: 1px solid #333; }
+        .prompt-row-top { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 11px; font-weight: bold; text-transform: uppercase; color: var(--text-dim); }
+        .prompt-input-custom { width: 100%; background: transparent; border: none; color: white; font-size: 13px; resize: none; outline: none; height: 80px; }
+        .prompt-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; font-size: 11px; color: var(--text-dim); }
+
+        .switch { position: relative; display: inline-block; width: 34px; height: 20px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #444; transition: .4s; border-radius: 20px; }
+        .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--accent-yellow); }
+
+        footer { height: 65px; background: #18181d; border-top: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; padding: 0 25px; margin-top: auto; }
+        .btn-next { background: var(--accent-yellow); color: black; border: none; padding: 10px 25px; border-radius: 6px; font-weight: bold; cursor: pointer; }
+        
+       /* KHUNG BUTTON CHOOSE STORYBOARD */
+        .control-action-btn {
+            width: 100%; background: #1e1e24; border: 1px dashed #444; border-radius: 10px; padding: 15px;
+            color: var(--text-dim); cursor: pointer; text-align: center; transition: 0.3s;
+        }
+        .control-action-btn:hover { border-color: var(--accent-yellow); background: #25252b; color: white; }
+        .control-action-btn i { font-size: 20px; display: block; margin-bottom: 8px; color: var(--accent-yellow); }
+
+        .prompt-area-wrap { background: var(--card-bg); border-radius: 10px; padding: 12px; border: 1px solid #333; }
+        .prompt-row { display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 8px; color: var(--text-dim); }
+        .prompt-input-custom { width: 100%; background: transparent; border: none; color: white; font-size: 13px; resize: none; outline: none; height: 70px; }
+        
+        .toggle-row { display: flex; justify-content: space-between; align-items: center; font-size: 13px; }
+        .switch { position: relative; display: inline-block; width: 34px; height: 20px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #444; transition: .4s; border-radius: 20px; }
+        .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--accent-yellow); }
+        input:checked + .slider:before { transform: translateX(14px); }
+
+        footer { 
+            position: fixed; bottom: 0; width: 100%; background: #18181d; 
+            padding: 15px 40px; border-top: 1px solid var(--border-color); 
+            display: flex; justify-content: flex-end; gap: 15px; z-index: 1001;
+        }
+        .btn { padding: 10px 25px; border-radius: 6px; border: none; font-weight: bold; cursor: pointer; font-size: 14px; }
+        .btn-yellow { background: var(--accent-yellow); color: #000; } 
+        .btn-outline { background: #333; color: #fff; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-top-left">
+            <i class="fa-solid fa-chevron-left" style="cursor: pointer;"></i>
+            <div class="project-name-wrapper">
+                <input type="text" id="prj-title" class="project-input" value="Draft project" readonly>
+                <i class="fa-solid fa-pen-to-square" style="cursor:pointer; font-size:13px; color:#888;" onclick="toggleEditProject()"></i>
+            </div>
+        </div>
+
+        <nav class="stepper-nav">
+            <div class="step-node active"><i class="fa-solid fa-file-lines"></i><span>Content</span></div>
+            <div class="step-connector active"></div>
+            <div class="step-node"><i class="fa-solid fa-user-check"></i><span>Cast</span></div>
+            <div class="step-connector"></div>
+            <div class="step-node"><i class="fa-solid fa-film"></i><span>Storyboard</span></div>
+            <div class="step-connector"></div>
+            <div class="step-node"><i class="fa-solid fa-sliders"></i><span>Edit</span></div>
+        </nav>
+
+        <div class="header-top-right">
+            <div class="coin-status"><i class="fa-solid fa-coins"></i><span>70</span></div>
+            <div class="user-info">
+                <span>Username</span>
+                <img src="https://i.pravatar.cc/100" alt="avatar">
+            </div>
+        </div>
+    </header>
+	
+	<main class="main-container">
+        <aside class="left-panel">
+            <div class="control-group">
+                <span class="label-sm">Voiceover Speed</span>
+                <div class="speed-ctrl">
+                    <button class="speed-btn" onclick="adjSpeed(-0.1)"><i class="fa-solid fa-minus"></i></button>
+                    <span id="speed-val">1.0 x</span>
+                    <button class="speed-btn" onclick="adjSpeed(0.1)"><i class="fa-solid fa-plus"></i></button>
+                </div>
+            </div>
+            <div class="control-group">
+                <span class="label-sm">Voiceover</span>
+                <select class="voice-sel"><option>William (Male - Calm)</option></select>
+            </div>
+            <div class="story-list-container">
+                <div class="label-sm" style="margin-bottom: 10px; color: var(--accent-yellow); width: 100%;">Auto generated 15 Storyboards</div>
+                <button class="nav-btn-v" onclick="scrollV('up')"><i class="fa-solid fa-chevron-up"></i></button>
+                <div class="story-scroll" id="story-list"></div>
+                <button class="nav-btn-v" onclick="scrollV('down')"><i class="fa-solid fa-chevron-down"></i></button>
+            </div>
+        </aside>
+
+        <section class="center-panel">
+            <div class="review-frame">
+                <img id="main-view-img" src="">
+                <div class="btn-edit-main" onclick="toggleEditPopup(event)">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> Edit
+                </div>
+                <div class="edit-popup" id="edit-popup">
+                    <div class="edit-option"><i class="fa-solid fa-shirt"></i> Clothe Remove</div>
+                    <div class="edit-option"><i class="fa-solid fa-face-smile"></i> Expression</div>
+                    <div class="edit-option"><i class="fa-solid fa-person"></i> Figure</div>
+                    <div class="edit-option"><i class="fa-solid fa-mountain-sun"></i> Scene</div>
+                    <div class="edit-option"><i class="fa-solid fa-wand-magic"></i> Effects</div>
+                    <div class="edit-option"><i class="fa-solid fa-terminal"></i> Prompt</div>
+                </div>
+            </div>
+            <div class="text-box" id="scene-desc">...</div>
+            <div class="gen-history-wrap">
+                <div class="label-sm" style="margin-bottom: 10px;">Generation history</div>
+                <div class="history-list" id="h-list">
+                    <div class="upload-inline-btn" onclick="document.getElementById('file-up').click()">
+                        <i class="fa-solid fa-plus"></i>
+                        <span style="font-size: 9px; margin-top: 4px;">Upload images</span>
+                    </div>
+                </div>
+                <input type="file" id="file-up" style="display:none" onchange="handleUpload(this)">
+            </div>
+        </section>
+
+        <aside class="right-panel">
+            <div class="section-header"><span class="label-sm">On-Screen Character</span><button class="btn-link">Edit Character</button></div>
+            <div style="display:flex; gap:10px; background:var(--card-bg); padding:10px; border-radius:8px;">
+                <img src="https://i.pravatar.cc/100?u=man" style="width:40px; height:40px; border-radius:50%;">
+                <div style="font-size:12px;"><strong>Trần</strong><br><span style="color:var(--text-dim)">Main Protagonist</span></div>
+            </div>
+            <div class="section-header"><span class="label-sm">Current Storyboard</span><button class="btn-link">Edit Storyboard</button></div>
+			<button class="control-action-btn" onclick="document.getElementById('file-up').click()">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                Choose a storyboard to control character actions. This shot is generated from a prompt.
+            </button>
+
+            <div class="prompt-area-wrap">
+                <div class="prompt-row-top"><span>Prompt</span><button class="btn-link">Click here for tips</button></div>
+                <textarea class="prompt-input-custom" id="prompt-txt"></textarea>
+                <div class="prompt-footer"><button class="btn-link" style="color:white">All Expand</button><span>45/2500</span></div>
+            </div>
+            <button style="width:100%; background:var(--accent-yellow); color:black; border:none; padding:15px; border-radius:8px; font-weight:bold; cursor:pointer;">✨ Re-generate Shot</button>
+            <div style="display:flex; justify-content:space-between; align-items:center; font-size:13px;">
+                <span>Dynamic Camera</span>
+                <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
+            </div>
+            <button style="width:100%; background:#2d2d35; color:white; border:1px solid #444; padding:12px; border-radius:8px; font-weight:bold; cursor:pointer;"><i class="fa-solid fa-play" style="margin-right:8px;"></i> Animate</button>
+        </aside>
+    </main>
+
+    <footer>
+        <button class="btn btn-outline" onclick="location.href='cast.html'">Back</button>
+        <button class="btn btn-yellow" onclick="location.href='edit.html'">Next</button>
+    </footer>
+
+    <script>
+        let scenes = [
+            { id: 1, label: "01", history: ["https://picsum.photos/id/10/800/450"], activeIdx: 0, text: "Scene 01: Ánh sao đêm rực rỡ bên hiên nhà cổ.", prompt: "Starry night prompt" },
+            { id: 2, label: "02", history: ["https://picsum.photos/id/20/800/450"], activeIdx: 0, text: "Scene 02: Thành phố lên đèn lung linh huyền ảo.", prompt: "City light prompt" },
+            { id: 3, label: "03", history: ["https://picsum.photos/id/30/800/450"], activeIdx: 0, text: "Scene 03: Gió thổi qua cánh đồng cỏ mênh mông.", prompt: "Windy field prompt" },
+            { id: 4, label: "04", history: ["https://picsum.photos/id/40/800/450"], activeIdx: 0, text: "Scene 04: Những bước chân chậm rãi trên sỏi trắng.", prompt: "Walking prompt" },
+            { id: 5, label: "05", history: ["https://picsum.photos/id/50/800/450"], activeIdx: 0, text: "Scene 05: Ánh nhìn xa xăm đầy hy vọng.", prompt: "Hopeful eyes" }
+        ];
+
+        let currentId = 1;
+
+        function renderAll() {
+            const list = document.getElementById('story-list');
+            list.innerHTML = "";
+            scenes.forEach(s => {
+                const card = document.createElement('div');
+                card.className = `story-card ${s.id === currentId ? 'active' : ''}`;
+                card.onclick = () => { currentId = s.id; renderAll(); };
+                card.innerHTML = `
+                    <span class="scene-label">${s.label}</span>
+                    <div class="btn-more-story" onclick="toggleStoryMenu(event, ${s.id})"><i class="fa-solid fa-ellipsis"></i></div>
+                    <div class="story-options-menu" id="menu-${s.id}">
+                        <i class="fa-solid fa-trash" title="Delete"></i>
+                        <i class="fa-solid fa-copy" title="Copy"></i>
+                        <i class="fa-solid fa-download" title="Download"></i>
+                    </div>
+                    <img src="${s.history[s.activeIdx]}">
+                `;
+                list.appendChild(card);
+            });
+            const currentScene = scenes.find(x => x.id === currentId);
+            document.getElementById('main-view-img').src = currentScene.history[currentScene.activeIdx];
+            document.getElementById('scene-desc').innerText = currentScene.text;
+            document.getElementById('prompt-txt').value = currentScene.prompt;
+            const hList = document.getElementById('h-list');
+            const uploadBtn = hList.querySelector('.upload-inline-btn');
+            hList.innerHTML = ""; hList.appendChild(uploadBtn);
+            currentScene.history.forEach((imgSrc, idx) => {
+                const imgEl = document.createElement('img');
+                imgEl.src = imgSrc;
+                imgEl.className = `h-img ${idx === currentScene.activeIdx ? 'active' : ''}`;
+                imgEl.onclick = () => { currentScene.activeIdx = idx; renderAll(); };
+                hList.appendChild(imgEl);
+            });
+        }
+
+        function toggleStoryMenu(e, id) {
+            e.stopPropagation();
+            document.querySelectorAll('.story-options-menu').forEach(m => m.style.display = 'none');
+            document.getElementById(`menu-${id}`).style.display = 'block';
+        }
+
+        function toggleEditPopup(e) {
+            e.stopPropagation();
+            const popup = document.getElementById('edit-popup');
+            popup.style.display = (popup.style.display === 'block') ? 'none' : 'block';
+        }
+
+        document.addEventListener('click', () => {
+            if(document.getElementById('edit-popup')) document.getElementById('edit-popup').style.display = 'none';
+            document.querySelectorAll('.story-options-menu').forEach(m => m.style.display = 'none');
+        });
+
+        function handleUpload(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const currentScene = scenes.find(x => x.id === currentId);
+                    currentScene.history.push(e.target.result);
+                    currentScene.activeIdx = currentScene.history.length - 1;
+                    renderAll();
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function scrollV(dir) {
+            document.getElementById('story-list').scrollTop += (dir === 'up' ? -170 : 170);
+        }
+
+        function adjSpeed(v) {
+            let s = parseFloat(document.getElementById('speed-val').innerText);
+            s = Math.max(0.5, Math.min(2.0, s + v));
+            document.getElementById('speed-val').innerText = s.toFixed(1) + " x";
+        }
+
+        function toggleEditProject() {
+            const input = document.getElementById('prj-title');
+            if (input.hasAttribute('readonly')) {
+                input.removeAttribute('readonly'); input.focus(); input.select();
+                input.onblur = function() { input.setAttribute('readonly', 'true'); };
+                input.onkeydown = function(e) { if(e.key === 'Enter') input.blur(); };
+            }
+        }
+        renderAll();
+    </script>
+</body>
+</html>
