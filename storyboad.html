@@ -2,6 +2,7 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
@@ -225,11 +226,11 @@
         </div>
 
         <nav class="stepper-nav">
-            <div class="step-node"><i class="fa-solid fa-file-lines"></i><span>Content</span></div>
+            <div class="step-node active"><i class="fa-solid fa-file-lines"></i><span>Content</span></div>
             <div class="step-connector active"></div>
             <div class="step-node"><i class="fa-solid fa-user-check"></i><span>Cast</span></div>
             <div class="step-connector"></div>
-            <div class="step-node active"><i class="fa-solid fa-film"></i><span>Storyboard</span></div>
+            <div class="step-node"><i class="fa-solid fa-film"></i><span>Storyboard</span></div>
             <div class="step-connector"></div>
             <div class="step-node"><i class="fa-solid fa-sliders"></i><span>Edit</span></div>
         </nav>
@@ -258,7 +259,7 @@
                 <select class="voice-sel"><option>William (Male - Calm)</option></select>
             </div>
             <div class="story-list-container">
-                <div class="label-sm" style="margin-bottom: 10px; color: var(--accent-yellow); width: 100%;">Auto generated 15 Storyboards</div>
+                <div class="label-sm" style="margin: 20px 0px; text-align: center; color: var(--accent-yellow); width: 100%;">Auto generated 15 Storyboards</div>
                 <button class="nav-btn-v" onclick="scrollV('up')"><i class="fa-solid fa-chevron-up"></i></button>
                 <div class="story-scroll" id="story-list"></div>
                 <button class="nav-btn-v" onclick="scrollV('down')"><i class="fa-solid fa-chevron-down"></i></button>
@@ -308,7 +309,7 @@
             <div class="prompt-area-wrap">
                 <div class="prompt-row-top"><span>Prompt</span><button class="btn-link">Click here for tips</button></div>
                 <textarea class="prompt-input-custom" id="prompt-txt"></textarea>
-                <div class="prompt-footer"><button class="btn-link" style="color:white">All Expand</button><span>45/2500</span></div>
+                <div class="prompt-footer"><button class="btn-link" style="var(--accent-yellow)">All Expand</button><span>45/2500</span></div>
             </div>
             <button style="width:100%; background:var(--accent-yellow); color:black; border:none; padding:15px; border-radius:8px; font-weight:bold; cursor:pointer;">✨ Re-generate Shot</button>
             <div style="display:flex; justify-content:space-between; align-items:center; font-size:13px;">
