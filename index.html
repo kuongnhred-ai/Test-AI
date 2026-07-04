@@ -1,1106 +1,1387 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Video Creation Interface - Final Version</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        :root {
-            --bg-color: #121216;
-            --sidebar-bg: #1a1a20;
-            --card-bg: #25252b;
-            --accent-yellow: #f8d448;
-            --text-main: #ffffff;
-            --text-dim: #a0a0a5;
-            --border-color: #33333a;
-            --blue-glow: #0095ff;
-        }
-		.ratio-card {
-        flex: 1;
-        background: var(--card-bg);
-        padding: 12px;
-        border-radius: 8px;
-        border: 2px solid transparent;
-        cursor: pointer;
-        text-align: center;
-        color: var(--text-dim);
-        transition: all 0.2s ease;
-    }
-    
-    .ratio-card i {
-        color: inherit; /* Icon sẽ đi theo màu của text */
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AXI — Đài Điều Hành Thông Minh (Generative UI Concept)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
 
-<<<<<<< HEAD
-    .ratio-card.active {
-        border-color: var(--blue-glow);
-        background: #1e2836;
-        color: var(--blue-glow);
-    }
-		body { background-color: var(--bg-color); color: var(--text-main); font-family: 'Inter', sans-serif; }
-=======
-        // LƯU Ý: Để API key thật ở đây sẽ an toàn hơn localhost
-        const YOUR_GEMINI_KEY = "AIzaSyBgFJkH5n7pLm5O6N7P8Q9R0S1T2U3V4W5";
->>>>>>> 339e715a59f34ce79d63d171349a7a1722b6c896
-
-        /* --- PHẦN TAB SCRIPT (CẬP NHẬT MỚI) --- */
-        .tabs-container {
-            display: flex;
-            gap: 5px;
-            margin-bottom: -1px; /* Để dính liền với khung editor bên dưới */
-        }
-		
-
-        .tab-btn {
-            padding: 12px 25px;
-            background: #1a1a20;
-            border: 1px solid var(--border-color);
-            border-bottom: none;
-            color: var(--text-dim);
-            border-radius: 8px 8px 0 0;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 14px;
-            transition: all 0.3s ease;
-            opacity: 0.5; /* Mặc định mờ đi */
-        }
-
-        /* Khi Tab được chọn sáng lên */
-        .tab-btn.active {
-            background: var(--card-bg);
-            color: var(--text-main);
-            opacity: 1; /* Sáng rõ */
-            border-top: 2px solid var(--accent-yellow);
-        }
-
-        .editor-container {
-            background: var(--card-bg);
-            padding: 20px;
-            border-radius: 0 8px 8px 8px;
-            border: 1px solid var(--border-color);
-            min-height: 300px;
-        }
-
-        #main-script {
-            width: 100%; height: 250px; background: transparent;
-            border: none; color: white; resize: none; outline: none;
-            font-size: 15px; line-height: 1.6;
-        }
-		/* --- STYLE CHO POPUP AI EXPANSION --- */
-        .ai-modal-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            display: none; /* Ẩn mặc định */
-            justify-content: center;
-            align-items: center;
-            z-index: 2000;
-            padding: 20px;
-        }
-
-        .ai-modal-content {
-            background: #1a1a20;
-            width: 100%;
-            max-width: 600px;
-            border-radius: 15px;
-            border: 1px solid var(--border-color);
-            overflow: hidden;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .ai-modal-header {
-            padding: 15px 20px;
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .ai-modal-body { padding: 20px; }
-        
-        #ai-result-text {
-            width: 100%;
-            height: 250px;
-            background: #25252b;
-            color: #eee;
-            border: 1px solid #444;
-            border-radius: 8px;
-            padding: 15px;
-            font-size: 14px;
-            line-height: 1.6;
-            resize: none;
-            outline: none;
-        }
-
-        .ai-modal-footer {
-            padding: 15px 20px;
-            display: flex;
-            justify-content: flex-end;
-            gap: 12px; /* Khoảng cách giữa 2 nút */
-            background: #16161c;
-        }
-
-        /* Nút Cancel/Close */
-        .btn-ai-cancel {
-            background: #333;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: 0.2s;
-        }
-        .btn-ai-cancel:hover { background: #444; }
-
-        /* Nút Apply/Confirm */
-        .btn-ai-apply {
-            background: var(--accent-yellow);
-            color: black;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Responsive cho Popup */
-        @media (max-width: 480px) {
-            .ai-modal-footer {
-                flex-direction: column-reverse; /* Đảo ngược để nút Cancel nằm dưới nút Apply */
-            }
-            .btn-ai-cancel, .btn-ai-apply { width: 100%; }
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background-color: var(--bg-color); color: var(--text-main); font-family: 'Inter', sans-serif; padding-bottom: 100px; }
-
-        /* --- HEADER --- */
-        header { 
-            background: #18181d; 
-            border-bottom: 1px solid var(--border-color);
-            padding: 10px 25px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-
-        .header-top-left { display: flex; align-items: center; gap: 10px; flex: 1; }
-        .project-name-wrapper { display: flex; align-items: center; gap: 8px; }
-        .project-input { 
-            background: transparent; border: none; color: white; 
-            font-weight: bold; font-size: 16px; outline: none; width: auto; max-width: 150px;
-            border-bottom: 1px solid transparent;
-        }
-        .project-input:not([readonly]) { border-bottom: 1px solid var(--accent-yellow); background: #222; }
-
-        /* Stepper Menu */
-        .stepper-nav { display: flex; align-items: center; gap: 0; flex: 2; justify-content: center; }
-        .step-node { display: flex; flex-direction: column; align-items: center; position: relative; width: 80px; z-index: 2; }
-        .step-node i { font-size: 20px; color: var(--text-dim); margin-bottom: 6px; }
-        .step-node span { font-size: 10px; color: var(--text-dim); text-transform: uppercase; font-weight: 600; }
-        .step-node.active i, .step-node.active span { color: var(--accent-yellow); }
-        .step-connector { height: 1px; background: #444; flex-grow: 1; max-width: 60px; margin-bottom: 18px; z-index: 1; }
-        .step-connector.active { background: var(--accent-yellow); }
-
-        .header-top-right { display: flex; align-items: center; gap: 20px; flex: 1; justify-content: flex-end; }
-        .coin-status { color: var(--accent-yellow); font-weight: bold; display: flex; align-items: center; gap: 5px; font-size: 14px; }
-        .user-info { display: flex; align-items: center; gap: 10px; }
-        .user-info img { width: 32px; height: 32px; border-radius: 50%; border: 1px solid #444; }
-
-        /* --- LAYOUT quan trọng để giữ Responsive --- */
-        .main-layout { display: grid; grid-template-columns: 280px 1fr 320px; gap: 25px; padding: 25px; }
-
-        /* --- RESPONSIVE LOGIC --- */
-        @media (max-width: 992px) {
-            header { flex-wrap: wrap; }
-            .header-top-left { order: 1; flex: 1; }
-            .header-top-right { order: 2; flex: 1; }
-            .stepper-nav { 
-                order: 3; width: 100%; flex: none; margin-top: 15px; 
-                padding-top: 10px; border-top: 1px solid var(--border-color);
-                justify-content: space-evenly;
-            }
-            .main-layout { grid-template-columns: 1fr !important; } /* Ép 1 cột khi mobile */
-        }
-
-        /* Logic Synopsis từ index_02 */
-        #page-synopsis { display: none; padding: 25px; }
-        .footer-bar { position: fixed; bottom: 0; width: 100%; background: #18181d; padding: 15px 40px; border-top: 1px solid #333; display: flex; justify-content: flex-end; gap: 10px; }
-        .btn-next { background: var(--accent-yellow); color: black; border: none; padding: 12px 30px; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        .btn-back { background: #333; color: white; border: none; padding: 12px 30px; border-radius: 8px; font-weight: bold; cursor: pointer; display: none; }
-
-        /* Responsive Layout - Thứ tự hiển thị: Giữa -> Trái -> Phải */
-        .main-layout { 
-            display: grid; 
-            grid-template-columns: 280px 1fr 320px; 
-            gap: 25px; 
-            padding: 25px; 
-            max-width: 1800px; 
-            margin: 0 auto; 
-        }
-
-        @media (max-width: 1024px) {
-            .main-layout { 
-                display: flex; 
-                flex-direction: column; 
-            }
-            .main-layout section { order: 1; } /* Phần giữa lên đầu */
-            .main-layout aside:first-of-type { order: 2; } /* Phần trái tiếp theo */
-            .main-layout aside:last-of-type { order: 3; } /* Phần phải cuối cùng */
-            
-            .stepper { display: none; }
-            header { padding: 10px; }
-        }
-
-        /* Sidebar & Settings */
-        .section-label { font-size: 14px; font-weight: bold; margin-bottom: 12px; display: block; color: var(--blue-glow); }
-        .setting-box { margin-bottom: 25px; }
-        
-        .ratio-card { flex: 1; background: var(--card-bg); padding: 12px; border-radius: 8px; border: 2px solid transparent; cursor: pointer; text-align: center; color: var(--text-dim); }
-        .ratio-card i { font-size: 20px; display: block; margin-bottom: 5px; }
-        .ratio-card.active { border-color: var(--blue-glow); background: #1e2836; color: var(--blue-glow); }
-        
-        .custom-select { width: 100%; background: var(--card-bg); color: white; border: 1px solid var(--border-color); padding: 10px; border-radius: 8px; outline: none; margin-top: 5px; cursor: pointer; }
-
-        /* Style Model */
-        .style-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; }
-        .style-item { cursor: pointer; text-align: center; font-size: 10px; color: var(--text-dim); }
-        .style-item img { width: 100%; height: 75px; border-radius: 6px; object-fit: cover; border: 2px solid transparent; transition: 0.2s; }
-        .style-item.selected img { border-color: var(--accent-yellow); }
-
-        /* Editor Section */
-        .tabs { display: flex; }
-        .tab { padding: 12px 25px; background: #232328; border: 1px solid var(--border-color); color: var(--text-dim); border-radius: 8px 8px 0 0; cursor: pointer; border-bottom: none; }
-        .tab.active { background: var(--card-bg); color: white; }
-        .editor-container { background: var(--card-bg); padding: 20px; border-radius: 0 8px 8px 8px; border: 1px solid var(--border-color); }
-        .main-textarea { width: 100%; height: 220px; background: transparent; border: none; color: white; resize: none; outline: none; font-size: 15px; }
-        
-        .expansion-row { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; padding-top: 10px; border-top: 1px solid #333; }
-        .duration-line { display: flex; align-items: center; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
-        .dur-btn { background: #2a2a32; border: 1px solid #444; color: white; padding: 6px 15px; border-radius: 6px; cursor: pointer; font-size: 12px; transition: 0.2s; }
-        .dur-btn.active { border-color: var(--accent-yellow); color: var(--accent-yellow); }
-
-        /* Trending Section */
-        .tag-list { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 15px; }
-        .tag { background: #2a2a32; padding: 4px 10px; border-radius: 12px; font-size: 10px; cursor: pointer; color: var(--text-dim); }
-        .tag.active { background: var(--accent-yellow); color: black; font-weight: bold; }
-        
-        .trend-item { margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 15px; }
-        .trend-header { display: flex; justify-content: space-between; position: relative; gap: 10px; }
-        .trend-img { width: 50px; height: 50px; border-radius: 6px; object-fit: cover; border: 1px solid #444; }
-        .rank-badge { position: absolute; top: -5px; right: -5px; background: rgba(0,0,0,0.85); padding: 2px; border-radius: 4px; font-size: 12px; }
-
-        /* PAGE SYNOPSIS */
-        #page-synopsis { display: none; padding: 25px; max-width: 1100px; margin: 0 auto; }
-        .scene-card { background: #1b1b20; border-radius: 12px; padding: 20px; margin-bottom: 20px; border: 1px solid #333; }
-        .scene-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .scene-icons { display: flex; gap: 15px; color: #666; font-size: 16px; }
-        .scene-icons i { cursor: pointer; transition: 0.2s; }
-        .scene-icons i.selected { color: var(--accent-yellow); text-shadow: 0 0 5px var(--accent-yellow); }
-        
-        .shot-row { display: flex; align-items: center; gap: 15px; background: #2a2a32; padding: 12px; border-radius: 8px; cursor: pointer; margin-top: 8px; border: 1px solid transparent; }
-        .sub-input { flex: 1; background: transparent; border: none; color: white; font-size: 14px; outline: none; }
-        .shot-tools { display: none; gap: 10px; color: #888; font-size: 12px; align-items: center; }
-        
-        .shot-desc { display: none; background: #1a1a1f; border: 1px solid var(--accent-yellow); border-radius: 8px; padding: 15px; margin: 10px 0 10px 40px; position: relative; }
-        .desc-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px; }
-        .btn-confirm-shot { background: var(--accent-yellow); color: black; border: none; padding: 6px 15px; border-radius: 4px; font-size: 12px; font-weight: bold; cursor: pointer; }
-        .btn-cancel-shot { background: #444; color: white; border: none; padding: 6px 15px; border-radius: 4px; font-size: 12px; font-weight: bold; cursor: pointer; }
-
-        /* Footer Bar */
-        .footer-bar { position: fixed; bottom: 0; width: 100%; background: #18181d; padding: 15px 40px; border-top: 1px solid var(--border-color); display: flex; justify-content: flex-end; gap: 15px; z-index: 100; }
-        .btn-next, .btn-back { background: var(--accent-yellow); color: black; border: none; padding: 12px 40px; border-radius: 10px; font-weight: bold; cursor: pointer; }
-        .btn-back { background: #444; color: white; }
-
-        /* Modal Styles */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; align-items: center; justify-content: center; padding: 20px; }
-        .modal-box { background: #25252b; padding: 30px; border-radius: 15px; width: 100%; max-width: 600px; position: relative; color: white; }
-        .close-x { position: absolute; top: 15px; right: 15px; font-size: 24px; color: #fff; cursor: pointer; }
-        .video-info { margin-top: 15px; background: #18181d; padding: 15px; border-radius: 8px; }
-
-        /* AI Result Text Frame Style */
-        #ai-res { 
-            background: #1a1a1f; 
-            padding: 20px; 
-            border-radius: 10px; 
-            margin: 20px 0; 
-            color: #ccc; 
-            border: 1px solid #444; 
-            line-height: 1.6;
-            box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);
-        }
-		    /* ============================================================
-           CSS CHO PHẦN SYNOPSIS - FIX DÓNG THẲNG & ĐƯỜNG KẺ NỔI
-           ============================================================ */
-        #page-synopsis { display: none; padding: 25px; max-width: 1100px; margin: 0 auto; }
-        .scene-card { background: #1b1b20; border-radius: 12px; padding: 20px; margin-bottom: 20px; border: 1px solid #333; }
-        
-        .shot-group { position: relative; padding-left: 10px; }
-
-        .shot-item { position: relative; padding-bottom: 20px; }
-        
-        /* Đường kẻ nối dọc - Nổi lên trên bằng z-index */
-        .shot-item::before {
-            content: "";
-            position: absolute;
-            left: 19px; /* Căn giữa theo dot (Dot là 10px + padding/margin) */
-            top: 25px;
-            bottom: -5px;
-            width: 1px;
-            background: #444;
-            z-index: 10; /* Cho nổi lên trên */
-        }
-        .shot-item:last-child::before { display: none; }
-
-        .shot-main-row { 
-            display: flex; 
-            align-items: center; 
-            gap: 15px; 
-            background: #2a2a32; 
-            padding: 12px 15px; 
-            border-radius: 8px; 
-            cursor: pointer;
-            border: 1px solid transparent;
-            position: relative;
-            z-index: 5; /* Thấp hơn đường kẻ để đường kẻ đè qua nếu cần, hoặc cao hơn tùy thẩm mỹ */
-        }
-        .shot-main-row:hover { border-color: #444; }
-
-        .shot-dot { 
-            width: 10px; 
-            height: 10px; 
-            background: var(--accent-yellow); 
-            border-radius: 50%; 
-            box-shadow: 0 0 5px var(--accent-yellow);
-            flex-shrink: 0;
-            position: relative;
-            z-index: 15; /* Dot luôn ở trên cùng */
-        }
-
-        .shot-label { 
-            font-size: 13px; 
-            font-weight: bold; 
-            color: #888; 
-            min-width: 45px;
-        }
-
-        /* Container chính của hàng Subtitle */
-.subtitle-line {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex: 1;
-    min-width: 0; /* Quan trọng: cho phép flex item co lại nhỏ hơn nội dung của nó */
-}
-        .label-fix { color: var(--accent-yellow); font-weight: bold; font-size: 13px; white-space: nowrap; }
-        /* Ô input nhập liệu */
-.sub-input {
-    flex: 1; /* Chiếm hết khoảng trống còn lại */
-    min-width: 50px; /* Đảm bảo ô input không bị biến mất hoàn toàn */
-    background: transparent;
-    border: none;
-    color: white;
-    font-size: 14px;
-    outline: none;
-    /* Xử lý text khi quá dài */
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis; 
-    border-bottom: 1px solid transparent; /* Tạo cảm giác có thể sửa */
-    transition: 0.2s;
+:root{
+  --bg:#0a0f1c;
+  --bg-grid: radial-gradient(circle at 1px 1px, rgba(255,255,255,.035) 1px, transparent 0);
+  --panel:#111a2e;
+  --panel-2:#0d1526;
+  --border:#1e2c47;
+  --border-soft:#182338;
+  --text:#e7ecf7;
+  --text-dim:#8894ab;
+  --text-faint:#5b6780;
+  --amber:#f2a541;
+  --amber-dim:#5c451f;
+  --cyan:#4fc3f7;
+  --green:#4ade80;
+  --red:#f87171;
+  --radius:14px;
+  --mono:'JetBrains Mono',monospace;
+  --sans:'Inter',sans-serif;
 }
 
-.sub-input:focus {
-    border-bottom: 1px solid var(--accent-yellow);
-    background: rgba(255,255,255,0.05);
+*{margin:0;padding:0;box-sizing:border-box;font-family:var(--sans);}
+
+body{
+  background:var(--bg);
+  background-image:var(--bg-grid);
+  background-size:22px 22px;
+  color:var(--text);
+  min-height:100vh;
 }
 
-.subtitle-tools {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-shrink: 0; /* Quan trọng: Ngăn cụm này không bị co lại, giữ nguyên kích thước để hiện icon */
-    white-space: nowrap;
+.shell{max-width:1180px;margin:0 auto;padding:28px 28px 90px;}
+
+/* ================= HEADER ================= */
+
+.topbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:26px;
 }
 
-.extra-icons {
-    display: none; /* Hoặc flex tùy trạng thái */
-    gap: 12px;
-    align-items: center;
-}
-        
-        .extra-icons { display: none; gap: 5px; color: #666; }
-        .extra-icons i:hover { color: var(--accent-yellow); }
-
-        /* PHẦN DÓNG THẲNG: Shot Description thụt vào bằng khoảng Subtitles ở trên */
-        .shot-desc-area { 
-            display: none; 
-            margin-top: 2px; 
-            /* 15px (padding row) + 10px (dot) + 15px (gap) + 45px (shot label) + 15px (gap) ≈ 100px */
-            padding: 12px 15px 12px 100px; 
-            background: rgba(255,255,255,0.02); 
-            border-radius: 0 0 8px 8px; 
-        }
-        .desc-line { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
-        .desc-val-display { font-size: 12px; color: #888; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; flex: 1; }
-
-        .edit-box { display: none; margin-top: 10px; background: #1a1a1f; padding: 15px; border-radius: 6px; border: 1px solid var(--accent-yellow); }
-        .desc-textarea { width: 100%; background: transparent; border: none; color: #ccc; font-size: 13px; resize: none; outline: none; min-height: 60px; }
-        .btn-confirm { background: var(--accent-yellow); color: #000; border: none; padding: 5px 15px; border-radius: 4px; font-weight: bold; cursor: pointer; margin-top: 10px; }
-
-        /* Footer */
-        .footer-bar { position: fixed; bottom: 0; width: 100%; background: #18181d; padding: 15px 40px; border-top: 1px solid var(--border-color); display: flex; justify-content: flex-end; gap: 15px; z-index: 100; }
-        .btn-next { background: var(--accent-yellow); color: black; border: none; padding: 12px 40px; border-radius: 10px; font-weight: bold; cursor: pointer; }
-		
-		/* --- RESPONSIVE CHO SYNOPSIS (MOBILE) --- */
-
-/* --- TRẠNG THÁI MẶC ĐỊNH --- */
-.extra-icons i, .mobile-more-btn, .mobile-tools-popup {
-    display: none !important; /* Ẩn hết icon chức năng */
+.brand{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-weight:800;
+  font-size:20px;
+  letter-spacing:.5px;
 }
 
-.char-count {
-    color: #888;
-    font-size: 12px;
-    margin-left: auto;
-    padding-right: 10px;
-    display: inline-block;
+.brand .dot{
+  width:9px;height:9px;border-radius:50%;
+  background:var(--amber);
+  box-shadow:0 0 0 4px rgba(242,165,65,.15);
 }
 
-/* --- KHI CLICK VÀO DÒNG (DESKTOP) --- */
-@media (min-width: 769px) {
-    .subtitle-line.active .extra-icons i {
-        display: inline-block !important; /* Hiện icon */
-        margin-left: 5px;
-        cursor: pointer;
-        color: var(--text-dim);
-    }
-    .subtitle-line.active .extra-icons i:hover { color: var(--accent-yellow); }
+.brand small{
+  font-family:var(--mono);
+  font-size:11px;
+  color:var(--text-faint);
+  font-weight:500;
+  letter-spacing:1px;
+  margin-left:6px;
 }
 
-/* --- KHI CLICK VÀO DÒNG (MOBILE) --- */
-@media (max-width: 768px) {
-    .subtitle-line.active .extra-icons i {
-        display: none !important; /* Không hiện icon ngang */
-    }
-    .subtitle-line.active .mobile-more-btn {
-        display: inline-block !important; /* Hiện dấu ... */
-        margin-left: 10px;
-        color: var(--accent-yellow);
-        font-weight: bold;
-    }
-
-    /* Popup menu nổi trên mobile */
-    .mobile-tools-popup {
-        display: none;
-        position: absolute;
-        right: 10px;
-        top: 35px;
-        background: #1e1e24;
-        border: 1px solid #444;
-        padding: 12px;
-        border-radius: 8px;
-        z-index: 1000;
-        gap: 35px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.8);
-        align-items: center;
-    }
-    .show-mobile-menu .mobile-tools-popup {
-        display: flex !important;
-    }
+.session-info{
+  display:flex;align-items:center;gap:14px;
+  font-family:var(--mono);
+  font-size:12px;
+  color:var(--text-dim);
 }
-    </style>
+
+.session-info .clock{color:var(--cyan);}
+
+.icon-btn{
+  width:34px;height:34px;border-radius:10px;
+  border:1px solid var(--border);
+  background:var(--panel);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;
+  color:var(--text-dim);
+}
+
+/* ================= COMMAND CONSOLE ================= */
+
+.console{
+  background:linear-gradient(180deg,var(--panel),var(--panel-2));
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:22px;
+  margin-bottom:22px;
+  position:relative;
+  overflow:hidden;
+}
+
+.console::before{
+  content:"";
+  position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--amber),transparent);
+  opacity:.7;
+}
+
+.console-label{
+  font-family:var(--mono);
+  font-size:11px;
+  letter-spacing:1.5px;
+  text-transform:uppercase;
+  color:var(--text-faint);
+  margin-bottom:12px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.console-label .pulse{
+  width:6px;height:6px;border-radius:50%;background:var(--green);
+  animation:pulse 1.6s infinite;
+}
+
+@keyframes pulse{
+  0%,100%{opacity:1;}
+  50%{opacity:.25;}
+}
+
+.command-row{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  background:var(--bg);
+  border:1px solid var(--border-soft);
+  border-radius:12px;
+  padding:14px 16px;
+}
+
+.command-row .prompt{
+  color:var(--amber);
+  font-family:var(--mono);
+  font-size:15px;
+}
+
+.command-row input{
+  flex:1;
+  background:transparent;
+  border:none;
+  outline:none;
+  color:var(--text);
+  font-family:var(--mono);
+  font-size:14.5px;
+}
+
+.command-row input::placeholder{color:var(--text-faint);}
+
+.cmd-btn{
+  border:none;
+  border-radius:9px;
+  padding:9px 16px;
+  font-family:var(--mono);
+  font-size:13px;
+  font-weight:600;
+  cursor:pointer;
+  display:flex;align-items:center;gap:6px;
+}
+
+.cmd-btn.mic{background:var(--panel-2);border:1px solid var(--border-soft);color:var(--text-dim);}
+.cmd-btn.send{background:var(--amber);color:#1a1204;}
+.cmd-btn.send:hover{background:#ffb75c;}
+
+.chip-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:14px;
+}
+
+.chip{
+  font-family:var(--mono);
+  font-size:12px;
+  color:var(--cyan);
+  background:rgba(79,195,247,.08);
+  border:1px solid rgba(79,195,247,.25);
+  padding:6px 12px;
+  border-radius:999px;
+  cursor:pointer;
+  white-space:nowrap;
+}
+
+.chip:hover{background:rgba(79,195,247,.16);}
+
+/* ================= ROLE TABS ================= */
+
+.role-tabs{
+  display:flex;
+  gap:10px;
+  margin-bottom:26px;
+}
+
+.role-tab{
+  flex:1;
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:16px 18px;
+  cursor:pointer;
+  transition:.2s;
+  position:relative;
+}
+
+.role-tab:hover{border-color:var(--border-soft);}
+
+.role-tab.active{
+  border-color:var(--amber);
+  background:linear-gradient(135deg,rgba(242,165,65,.10),var(--panel));
+}
+
+.role-tab .level{
+  font-family:var(--mono);
+  font-size:10px;
+  letter-spacing:1px;
+  color:var(--text-faint);
+  text-transform:uppercase;
+  margin-bottom:6px;
+}
+
+.role-tab.active .level{color:var(--amber);}
+
+.role-tab .name{
+  font-weight:700;
+  font-size:15px;
+  margin-bottom:3px;
+}
+
+.role-tab .desc{
+  font-size:12px;
+  color:var(--text-dim);
+}
+
+/* ================= CANVAS ================= */
+
+#canvas{
+  display:flex;
+  flex-direction:column;
+  gap:18px;
+}
+
+.fade-in{
+  animation:fadeIn .5s ease both;
+}
+
+@keyframes fadeIn{
+  from{opacity:0;transform:translateY(8px);}
+  to{opacity:1;transform:translateY(0);}
+}
+
+.panel{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:22px;
+}
+
+.panel-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:16px;
+}
+
+.panel-head h3{
+  font-size:14px;
+  font-weight:700;
+  display:flex;align-items:center;gap:8px;
+}
+
+.panel-head .tag{
+  font-family:var(--mono);
+  font-size:10px;
+  color:var(--text-faint);
+  letter-spacing:1px;
+  text-transform:uppercase;
+}
+
+/* stat readouts */
+
+.stat-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:14px;
+}
+
+.stat{
+  background:var(--panel-2);
+  border:1px solid var(--border-soft);
+  border-radius:12px;
+  padding:16px;
+}
+
+.stat .label{font-size:11px;color:var(--text-dim);margin-bottom:8px;}
+
+.stat .value{
+  font-family:var(--mono);
+  font-size:22px;
+  font-weight:700;
+  color:var(--text);
+  margin-bottom:6px;
+}
+
+.stat .delta{font-family:var(--mono);font-size:11px;font-weight:600;}
+.stat .delta.up{color:var(--green);}
+.stat .delta.down{color:var(--red);}
+
+/* chart */
+
+.bars{
+  display:flex;align-items:flex-end;gap:10px;height:130px;margin-bottom:8px;
+}
+
+.bars .bar{
+  flex:1;
+  background:linear-gradient(180deg,var(--amber),#b97a1f);
+  border-radius:6px 6px 0 0;
+  opacity:0;
+  transform:scaleY(0);
+  transform-origin:bottom;
+  transition:transform .6s ease, opacity .6s ease;
+}
+
+.bars .bar.show{opacity:1;transform:scaleY(1);}
+
+.bar-labels{display:flex;gap:10px;}
+.bar-labels div{flex:1;text-align:center;font-family:var(--mono);font-size:10px;color:var(--text-faint);}
+
+.ai-note{
+  margin-top:14px;
+  padding:14px 16px;
+  border-left:2px solid var(--cyan);
+  background:rgba(79,195,247,.05);
+  border-radius:0 8px 8px 0;
+  font-size:13px;
+  color:var(--text-dim);
+  line-height:1.7;
+  min-height:20px;
+}
+
+.ai-note .cursor{
+  display:inline-block;width:6px;height:13px;background:var(--cyan);
+  animation:blink 1s step-end infinite;vertical-align:middle;margin-left:2px;
+}
+
+@keyframes blink{50%{opacity:0;}}
+
+/* permission list */
+
+.perm-list{list-style:none;display:flex;flex-direction:column;gap:9px;}
+.perm-list li{
+  font-size:12.5px;color:var(--text-dim);
+  display:flex;gap:8px;align-items:flex-start;
+}
+.perm-list li::before{content:"›";color:var(--amber);font-family:var(--mono);}
+
+/* two column */
+
+.cols-2{display:grid;grid-template-columns:1.5fr 1fr;gap:18px;}
+
+/* Leader: kanban */
+
+.kanban{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+
+.kcol{background:var(--panel-2);border:1px solid var(--border-soft);border-radius:12px;padding:12px;min-height:220px;}
+
+.kcol h5{font-size:11px;color:var(--text-faint);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;font-family:var(--mono);}
+
+.kcard{
+  background:var(--panel);
+  border:1px solid var(--border-soft);
+  border-radius:9px;
+  padding:10px 12px;
+  margin-bottom:8px;
+  font-size:12.5px;
+  color:var(--text);
+}
+
+.kcard.risk{border-color:var(--red);box-shadow:0 0 0 1px rgba(248,113,113,.15) inset;}
+
+.kcard .risk-tag{
+  display:inline-block;margin-top:6px;font-family:var(--mono);font-size:10px;
+  color:var(--red);background:rgba(248,113,113,.1);padding:2px 7px;border-radius:6px;
+}
+
+.alert-banner{
+  display:flex;gap:12px;align-items:flex-start;
+  border:1px solid rgba(248,113,113,.35);
+  background:rgba(248,113,113,.06);
+  border-radius:12px;
+  padding:14px 16px;
+  font-size:13px;
+  color:var(--text);
+}
+
+.alert-banner .ico{color:var(--red);font-family:var(--mono);}
+
+.workload{display:flex;flex-direction:column;gap:12px;}
+.workload .row{display:grid;grid-template-columns:90px 1fr 40px;align-items:center;gap:10px;font-size:12px;color:var(--text-dim);}
+.wtrack{height:7px;background:var(--panel-2);border-radius:999px;overflow:hidden;}
+.wfill{height:100%;background:linear-gradient(90deg,var(--cyan),var(--amber));border-radius:999px;}
+
+/* Staff: flow */
+
+.flow-wrap{display:flex;flex-direction:column;align-items:center;gap:22px;padding:20px 0;}
+
+.flow-card{
+  width:100%;max-width:520px;
+  background:var(--panel-2);
+  border:1px solid var(--border-soft);
+  border-radius:16px;
+  padding:28px;
+  text-align:center;
+}
+
+.flow-card .eyebrow{font-family:var(--mono);font-size:11px;color:var(--text-faint);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;}
+.flow-card h2{font-size:20px;margin-bottom:10px;}
+.flow-card p{color:var(--text-dim);font-size:13px;line-height:1.7;margin-bottom:18px;}
+
+.focus-btn{
+  border:none;border-radius:10px;padding:12px 22px;
+  background:var(--amber);color:#1a1204;font-weight:700;font-size:13px;cursor:pointer;
+}
+
+.ref-docs{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;}
+.ref-doc{
+  font-size:12px;color:var(--text-dim);
+  border:1px solid var(--border-soft);
+  padding:8px 14px;border-radius:999px;
+}
+
+.quiet-note{
+  font-size:11px;color:var(--text-faint);text-align:center;max-width:420px;
+}
+
+/* skeleton loader */
+
+.skeleton{
+  background:linear-gradient(90deg, var(--panel-2) 25%, #1a2540 37%, var(--panel-2) 63%);
+  background-size:400% 100%;
+  animation:shimmer 1.4s infinite;
+  border-radius:8px;
+}
+
+@keyframes shimmer{
+  0%{background-position:100% 50%;}
+  100%{background-position:0 50%;}
+}
+
+.skeleton-block{height:120px;border-radius:12px;margin-bottom:10px;}
+.skeleton-line{height:14px;margin-bottom:8px;width:70%;}
+
+.disclaimer{
+  text-align:center;
+  font-family:var(--mono);
+  font-size:11px;
+  color:var(--text-faint);
+  margin-top:30px;
+}
+
+/* ================= WORKFLOW & PERMISSION BUILDER ================= */
+
+.wf-desc{
+  font-size:12.5px;
+  color:var(--text-dim);
+  line-height:1.7;
+  margin-bottom:16px;
+  max-width:760px;
+}
+
+.wf-templates{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-bottom:20px;
+}
+
+.wf-template-chip.active{
+  background:rgba(242,165,65,.14);
+  border-color:var(--amber);
+  color:var(--amber);
+}
+
+.wf-flow{
+  display:flex;
+  align-items:flex-start;
+  gap:0;
+  overflow-x:auto;
+  padding-bottom:10px;
+  margin-bottom:18px;
+}
+
+.wf-node{
+  flex:0 0 220px;
+  background:var(--panel-2);
+  border:1px solid var(--border-soft);
+  border-radius:12px;
+  padding:14px;
+  transition:border-color .4s, box-shadow .4s;
+}
+
+.wf-node.active-pulse{
+  border-color:var(--green);
+  box-shadow:0 0 0 1px rgba(74,222,128,.25) inset;
+}
+
+.wf-node-dept{
+  font-family:var(--mono);
+  font-size:10px;
+  letter-spacing:1px;
+  text-transform:uppercase;
+  color:var(--cyan);
+  margin-bottom:8px;
+}
+
+.wf-node-title{
+  width:100%;
+  background:transparent;
+  border:none;
+  outline:none;
+  color:var(--text);
+  font-weight:700;
+  font-size:13px;
+  margin-bottom:14px;
+  padding:0;
+  font-family:var(--sans);
+}
+
+.wf-field{margin-bottom:12px;}
+
+.wf-field-label{
+  font-size:10px;
+  color:var(--text-faint);
+  margin-bottom:6px;
+  text-transform:uppercase;
+  letter-spacing:.5px;
+  font-family:var(--mono);
+}
+
+.seg-group{display:flex;gap:4px;flex-wrap:wrap;}
+
+.seg-btn{
+  font-family:var(--mono);
+  font-size:10.5px;
+  padding:5px 8px;
+  border-radius:7px;
+  border:1px solid var(--border-soft);
+  background:transparent;
+  color:var(--text-faint);
+  cursor:pointer;
+}
+
+.seg-btn.active{background:var(--panel);border-color:var(--amber);color:var(--text);}
+.seg-btn.auto-support.active{border-color:var(--cyan);color:var(--cyan);background:rgba(79,195,247,.08);}
+.seg-btn.auto-monitor.active{border-color:var(--amber);color:var(--amber);background:rgba(242,165,65,.08);}
+.seg-btn.auto-full.active{border-color:var(--green);color:var(--green);background:rgba(74,222,128,.08);}
+
+.wf-human-loop{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  font-size:10.5px;
+  color:var(--red);
+  margin-top:10px;
+  font-family:var(--mono);
+}
+
+.wf-arrow{
+  flex:0 0 46px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  color:var(--text-faint);
+  font-size:16px;
+  padding-top:40px;
+  transition:color .4s;
+}
+
+.wf-arrow.active-pulse{color:var(--green);}
+
+.wf-arrow-dot{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--border-soft);
+  margin-bottom:6px;
+  transition:background .4s;
+}
+
+.wf-arrow.active-pulse .wf-arrow-dot{
+  background:var(--green);
+  animation:pulse .8s infinite;
+}
+
+.wf-status-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:12px;
+  border-top:1px solid var(--border-soft);
+  padding-top:16px;
+}
+
+.wf-status{
+  font-family:var(--mono);
+  font-size:12px;
+  color:var(--text-dim);
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.wf-status .dot{width:8px;height:8px;border-radius:50%;}
+
+/* ================= ORG CHART BUILDER ================= */
+
+.org-ai-row{
+  display:flex;
+  gap:10px;
+  background:var(--bg);
+  border:1px solid var(--border-soft);
+  border-radius:12px;
+  padding:10px 12px;
+  margin-bottom:14px;
+}
+
+.org-ai-row input{
+  flex:1;
+  background:transparent;
+  border:none;
+  outline:none;
+  color:var(--text);
+  font-family:var(--mono);
+  font-size:13px;
+}
+
+.org-ai-row input::placeholder{color:var(--text-faint);}
+
+.org-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
+  gap:10px;
+  margin-bottom:14px;
+}
+
+.org-card{
+  background:var(--panel-2);
+  border:1px solid var(--border-soft);
+  border-radius:10px;
+  padding:12px;
+  position:relative;
+  cursor:grab;
+}
+
+.org-card:active{cursor:grabbing;}
+
+.org-card.drag-source{opacity:.4;}
+
+.org-remove{
+  position:absolute;top:6px;right:8px;
+  background:none;border:none;
+  color:var(--text-faint);
+  font-size:14px;cursor:pointer;
+  line-height:1;
+}
+
+.org-remove:hover{color:var(--red);}
+
+.org-name{
+  width:100%;
+  background:transparent;border:none;outline:none;
+  color:var(--text);font-weight:700;font-size:13px;
+  margin-bottom:6px;padding:0;
+}
+
+.org-head{
+  width:100%;
+  background:transparent;border:none;outline:none;
+  color:var(--text-dim);font-size:11px;
+  padding:0;font-family:var(--mono);
+}
+
+.add-dept-btn{
+  border:1px dashed var(--border-soft);
+  background:transparent;
+  color:var(--text-dim);
+  border-radius:10px;
+  padding:12px;
+  font-size:12px;
+  cursor:pointer;
+  width:100%;
+  text-align:center;
+  margin-bottom:16px;
+}
+
+.add-dept-btn:hover{border-color:var(--amber);color:var(--amber);}
+
+.wf-node-dept-select{
+  width:100%;
+  background:transparent;
+  border:none;
+  outline:none;
+  font-family:var(--mono);
+  font-size:10px;
+  letter-spacing:1px;
+  text-transform:uppercase;
+  color:var(--cyan);
+  margin-bottom:8px;
+  padding:0;
+}
+
+.wf-node-dept-select option{background:var(--panel-2);color:var(--text);}
+
+.wf-node{position:relative;}
+
+.wf-node-remove{
+  position:absolute;top:8px;right:8px;
+  background:none;border:none;color:var(--text-faint);
+  font-size:13px;cursor:pointer;line-height:1;
+}
+.wf-node-remove:hover{color:var(--red);}
+
+.wf-node.drag-target{border-color:var(--cyan);box-shadow:0 0 0 1px rgba(79,195,247,.3) inset;}
+
+.wf-flow.drag-over{outline:1px dashed var(--cyan);border-radius:12px;}
+
+.add-station-btn{
+  flex:0 0 90px;
+  border:1px dashed var(--border-soft);
+  border-radius:12px;
+  background:transparent;
+  color:var(--text-faint);
+  font-size:11px;
+  cursor:pointer;
+  align-self:stretch;
+}
+
+.add-station-btn:hover{border-color:var(--amber);color:var(--amber);}
+
+@media (max-width:900px){
+  .stat-grid{grid-template-columns:repeat(2,1fr);}
+  .cols-2{grid-template-columns:1fr;}
+  .kanban{grid-template-columns:repeat(2,1fr);}
+  .role-tabs{flex-direction:column;}
+}
+
+</style>
 </head>
 <body>
 
-     <header>
-        <div class="header-top-left">
-            <i class="fa-solid fa-chevron-left"></i>
-            <div class="project-name-wrapper">
-                <input type="text" id="prj-title" class="project-input" value="Draft project" readonly>
-                <i class="fa-solid fa-pen-to-square" style="cursor:pointer; font-size:13px; color:#888;" onclick="toggleEditProject()"></i>
-            </div>
-        </div>
+<div class="shell">
 
-        <nav class="stepper-nav">
-            <div class="step-node active"><i class="fa-solid fa-file-lines"></i><span>Content</span></div>
-            <div class="step-connector active"></div>
-            <div class="step-node"><i class="fa-solid fa-user-check"></i><span>Cast</span></div>
-            <div class="step-connector"></div>
-            <div class="step-node"><i class="fa-solid fa-film"></i><span>Storyboard</span></div>
-            <div class="step-connector"></div>
-            <div class="step-node"><i class="fa-solid fa-sliders"></i><span>Edit</span></div>
-        </nav>
-
-        <div class="header-top-right">
-            <div class="coin-status"><i class="fa-solid fa-coins"></i><span>70</span></div>
-            <div class="user-info"><span>Username</span><img src="https://i.pravatar.cc/100" alt="avatar"></div>
-        </div>
-    </header>
-
-    <main class="main-layout" id="page-1">
-        <aside>
-            <div class="setting-box">
-                <label class="section-label">Aspect Ratio</label>
-                <div style="display:flex; gap:10px">
-                    <div class="ratio-card active" onclick="setRatio(this)">
-                        <i class="fa-solid fa-laptop"></i>
-                        <strong>Landscape</strong><span>16:9</span>
-                    </div>
-                    <div class="ratio-card" onclick="setRatio(this)">
-                        <i class="fa-solid fa-mobile"></i>
-                        <strong>Portrait</strong><span>9:16</span>
-                    </div>
-                </div>
-            </div>
-            <div class="setting-box">
-                <label class="section-label" style="color:white">Video Language</label>
-                <select class="custom-select"><option>English</option><option>Vietnamese</option></select>
-            </div>
-            <div class="setting-box">
-                <label class="section-label" style="color:white">Story Model</label>
-                <select class="custom-select"><option>Gemini 3 Pro</option></select>
-            </div>
-            <div class="setting-box">
-                <label class="section-label" style="color:white">Style Model</label>
-                <div class="style-grid">
-                    <div class="style-item selected" onclick="setStyle(this)"><img src="https://img.freepik.com/premium-photo/cute-girl-3d-character-design-cartoon-girl-avatar_432516-5510.jpg?w=2000">3D Cartoon</div>
-                    <div class="style-item" onclick="setStyle(this)"><img src="https://cdn.creativefabrica.com/2022/11/04/Hyper-Realistic-Fantasy-Female-Red-Queen-From-Alice-In-Wonderland-44812134-1.png">Realistic</div>
-                    <div class="style-item" onclick="setStyle(this)"><img src="https://i.pinimg.com/originals/8f/25/a7/8f25a7221116d9c2b055afc1d574c562.jpg">Disney</div>
-                </div>
-            </div>
-        </aside>
-
-        <section>
-            <div class="tabs-container">
-            <button class="tab-btn active" onclick="switchTab(this)">Smart Script</button>
-            <button class="tab-btn" onclick="switchTab(this)">Basic Script</button>
-        </div>
-            <div class="editor-container">
-                <textarea id="main-script" class="main-textarea" placeholder="Nhập ý tưởng kịch bản..."></textarea>
-                <div class="expansion-row">
-                    
-					<button onclick="openAI()" style="background:none; border:1px solid #444; color:var(--accent-yellow); padding:6px 15px; border-radius:6px; cursor:pointer">✨ Expansion</button>
-                    <span style="color:var(--text-dim); font-size:12px">0/12000</span>
-                </div>
-            </div>
-            <div class="duration-line">
-                <span>Duration:</span>
-                <button class="dur-btn active" onclick="setDuration(this)">Auto</button>
-                <button class="dur-btn" onclick="setDuration(this)">3-5min</button>
-				<button class="dur-btn" onclick="setDuration(this)">5-10min</button>
-				<button class="dur-btn" onclick="setDuration(this)">10-20min</button>
-                <button class="dur-btn" onclick="setDuration(this)">Custom</button>
-            </div>
-        </section>
-
-        <aside>
-            <div class="trending-container">
-                <label class="section-label" style="color:white">Trending Script</label>
-                <div class="tag-list">
-                    <span class="tag active">Trending</span><span class="tag">Kids</span><span class="tag">Animals</span>
-                </div>
-                
-                <div class="trend-item">
-                    <div class="trend-header">
-                        <div style="flex:1"><p style="font-size:12px; font-weight: bold;">The Magical Paintbrush_01</p>
-						<p style="font-size:12px; color:#b9b8b8">Vào một đêm trăng khuyết, một cánh cổng ánh sáng bất ngờ mở ra...</p>
-						<span style="font-size:10px; color:#f8d448">63M Views</span></div>
-                        <div style="position:relative"><img src="https://i.pinimg.com/236x/33/f7/a7/33f7a77878a9eb171666436b3a3d0b57.jpg" class="trend-img"><span class="rank-badge">🥇</span></div>
-                    </div>
-                    <div style="display:flex; gap:5px; margin-top:8px">
-                        <button class="btn-trend" style="flex:1; background:#2a2a32; color:white; border:1px solid #444; padding:5px; cursor:pointer; font-size: 11px;" onclick="watchVideo('The Magical Paintbrush_01', 'Kịch bản về một cây bút thần kỳ có thể vẽ ra mọi thứ thành hiện thực.')">Watch Video</button>
-                        <button class="btn-trend" style="flex:1; background:#2a2a32; color:white; border:1px solid #444; padding:5px; cursor:pointer; font-size: 11px;" onclick="runScript('Kịch bản 01...')">Running</button>
-                    </div>
-                </div>
-
-                <div class="trend-item">
-                    <div class="trend-header">
-                        <div style="flex:1"><p style="font-size:12px; font-weight: bold;">The Magical Paintbrush_02</p>
-						<p style="font-size:12px; color:#b9b8b8">Vào một đêm trăng khuyết, một cánh cổng ánh sáng bất ngờ mở ra...</p>
-						<span style="font-size:10px; color:#f8d448">55M Views</span></div>
-                        <div style="position:relative"><img src="https://i.pinimg.com/736x/ef/a5/5d/efa55d463bb2a1d7a940ca846cbe9752.jpg" class="trend-img"><span class="rank-badge">🥈</span></div>
-                    </div>
-                    <div style="display:flex; gap:5px; margin-top:8px">
-                        <button class="btn-trend" style="flex:1; background:#2a2a32; color:white; border:1px solid #444; padding:5px; cursor:pointer; font-size: 11px;" onclick="watchVideo('The Magical Paintbrush_02', 'Phần 2 của kịch bản cây bút thần với những thử thách mới.')">Watch Video</button>
-                        <button class="btn-trend" style="flex:1; background:#2a2a32; color:white; border:1px solid #444; padding:5px; cursor:pointer; font-size: 11px;" onclick="runScript('Kịch bản 02...')">Running</button>
-                    </div>
-                </div>
-
-                <div class="trend-item">
-                    <div class="trend-header">
-                        <div style="flex:1"><p style="font-size:12px; font-weight: bold;">The Magical Paintbrush_03</p>
-						<p style="font-size:12px; color:#b9b8b8">Vào một đêm trăng khuyết, một cánh cổng ánh sáng bất ngờ mở ra...</p>
-						<span style="font-size:10px; color:#f8d448">42M Views</span></div>
-                        <div style="position:relative"><img src="https://i.pinimg.com/originals/48/5f/67/485f67c02ebf578cefb835289e2d18d6.png" class="trend-img"><span class="rank-badge">🥉</span></div>
-                    </div>
-                    <div style="display:flex; gap:5px; margin-top:8px">
-                        <button class="btn-trend" style="flex:1; background:#2a2a32; color:white; border:1px solid #444; padding:5px; cursor:pointer; font-size: 11px;" onclick="watchVideo('The Magical Paintbrush_03', 'Kết thúc hành trình của cây bút thần kỳ.')">Watch Video</button>
-                        <button class="btn-trend" style="flex:1; background:#2a2a32; color:white; border:1px solid #444; padding:5px; cursor:pointer; font-size: 11px;" onclick="runScript('Kịch bản 03...')">Running</button>
-                    </div>
-                </div>
-            </div>
-        </aside>
-    </main>
-
-  <main id="page-synopsis">
-        <h2>Synopsis</h2>
-		<p id="synopsis-desc" style="color:#aaa; font-size:14px; margin:15px 0 30px 0"></p>
-        
-        <div class="scene-card">
-            <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
-                <strong>Scene1: INT.SOUNDPROOF ROOM-DAY</strong>
-				
-                <div style="display:flex; gap:15px; color:#666; cursor:pointer;">
-                    <i class="fa-solid fa-expand"></i>
-                    <i class="fa-solid fa-pen-to-square"></i>
-                    <i class="fa-solid fa-copy"></i>
-                    <i class="fa-solid fa-trash"></i>
-                </div>
-            </div>
-
-            <div class="shot-group">
-                <div class="shot-item">
-                    <div class="shot-main-row" onclick="handleShotClick(this)">
-                        <div class="shot-dot"></div>
-                        <span class="shot-label">Shot 1</span>
-                        
-						
-						<div class="subtitle-line" onclick="activateRow(this)" style="position: relative; display: flex; align-items: center; padding: 10px 0;">
-    <span class="label-fix">Subtitles:</span>
-    <input type="text" class="sub-input" value="Nội dung kịch bản..." style="flex: 1; background: transparent; border: none; color: white;" onclick="event.stopPropagation()">
-
-    <div class="extra-icons" style="display: flex; align-items: center;">
-        <span class="char-count">100/200</span>
-        <i class="fa-solid fa-copy"></i>
-        <i class="fa-solid fa-trash"></i>
-        <i class="fa-solid fa-plus"></i>
-    </div>
-
-    <div class="mobile-more-btn" onclick="toggleMobileMenu(this, event)">...</div>
-
-    <div class="mobile-tools-popup">      
-        <i class="fa-solid fa-copy"></i>
-        <i class="fa-solid fa-trash"></i>
-        <i class="fa-solid fa-plus"></i>
-    </div>
+<div class="topbar">
+  <div class="brand">AXI<span class="dot"></span><small>GENERATIVE OPERATING LAYER</small></div>
+  <div class="session-info">
+    <span>Công ty: <b style="color:var(--text)">Demo SME Co.</b></span>
+    <span class="clock" id="clock">--:--:--</span>
+    <div class="icon-btn">⚙</div>
+  </div>
 </div>
-                    </div>
-                    
-                    <div class="shot-desc-area" onclick="event.stopPropagation()">
-                        <div class="desc-line">
-                            <div style="display:flex; gap:10px; flex:1;">
-                                <span class="label-fix">Shot Description:</span> 
-                                <div class="desc-val-display">@Wide shot of the forest floor, shadows moving...</div>
-                            </div>
-                            <i class="fa-solid fa-pen-to-square" style="color:#666; cursor:pointer;" onclick="openEdit(this)"></i>
-                        </div>
-                        <div class="edit-box">
-                            <textarea class="desc-textarea">@Wide shot of the forest floor, shadows moving...</textarea>
-                            <div style="display:flex; justify-content:flex-end;"><button class="btn-confirm" onclick="confirmEdit(this)">Confirm</button></div>
-                        </div>
-                    </div>
-                </div>
 
-                <div class="shot-item">
-                    <div class="shot-main-row" onclick="handleShotClick(this)">
-                        <div class="shot-dot"></div>
-                        <span class="shot-label">Shot 2</span>
-                         <div class="subtitle-line" onclick="activateRow(this)" style="position: relative; display: flex; align-items: center; padding: 10px 0;">
-    <span class="label-fix">Subtitles:</span>
-    <input type="text" class="sub-input" value="Nội dung kịch bản..." style="flex: 1; background: transparent; border: none; color: white;" onclick="event.stopPropagation()">
+<!-- ================= COMMAND CONSOLE ================= -->
 
-    <div class="extra-icons" style="display: flex; align-items: center;">
-        <span class="char-count">100/200</span>
-        <i class="fa-solid fa-copy"></i>
-        <i class="fa-solid fa-trash"></i>
-        <i class="fa-solid fa-plus"></i>
-    </div>
-
-    <div class="mobile-more-btn" onclick="toggleMobileMenu(this, event)">...</div>
-
-    <div class="mobile-tools-popup">      
-        <i class="fa-solid fa-copy"></i>
-        <i class="fa-solid fa-trash"></i>
-        <i class="fa-solid fa-plus"></i>
-    </div>
+<div class="console">
+  <div class="console-label"><span class="pulse"></span> ROUTER AGENT — SẴN SÀNG NHẬN Ý ĐỊNH</div>
+  <div class="command-row">
+    <span class="prompt">›</span>
+    <input id="cmdInput" type="text" placeholder="Nhập điều bạn cần… VD: cho tôi xem dòng tiền tháng này">
+    <button class="cmd-btn mic" title="Ra lệnh bằng giọng nói">🎙</button>
+    <button class="cmd-btn send" id="sendBtn">GỬI →</button>
+  </div>
+  <div class="chip-row" id="chipRow"></div>
 </div>
-                    </div>
-                    
-                    <div class="shot-desc-area" onclick="event.stopPropagation()">
-                        <div class="desc-line">
-                            <div style="display:flex; gap:10px; flex:1;">
-                                <span class="label-fix">Shot Description:</span>
-                                <div class="desc-val-display">@Close up of feet walking on dry leaves...</div>
-                            </div>
-                            <i class="fa-solid fa-pen-to-square" style="color:#666; cursor:pointer;" onclick="openEdit(this)"></i>
-                        </div>
-                        <div class="edit-box">
-                            <textarea class="desc-textarea">@Close up of feet walking on dry leaves...</textarea>
-                            <div style="display:flex; justify-content:flex-end;"><button class="btn-confirm" onclick="confirmEdit(this)">Confirm</button></div>
-                        </div>
-                    </div>
-                </div>
-				
-				<div class="shot-item">
-                    <div class="shot-main-row" onclick="handleShotClick(this)">
-                        <div class="shot-dot"></div>
-                        <span class="shot-label">Shot 3</span>
-                         <div class="subtitle-line" onclick="activateRow(this)" style="position: relative; display: flex; align-items: center; padding: 10px 0;">
-    <span class="label-fix">Subtitles:</span>
-    <input type="text" class="sub-input" value="Nội dung kịch bản..." style="flex: 1; background: transparent; border: none; color: white;" onclick="event.stopPropagation()">
 
-    <div class="extra-icons" style="display: flex; align-items: center;">
-        <span class="char-count">100/200</span>
-        <i class="fa-solid fa-copy"></i>
-        <i class="fa-solid fa-trash"></i>
-        <i class="fa-solid fa-plus"></i>
-    </div>
+<!-- ================= ROLE TABS ================= -->
 
-    <div class="mobile-more-btn" onclick="toggleMobileMenu(this, event)">...</div>
-
-    <div class="mobile-tools-popup">      
-        <i class="fa-solid fa-copy"></i>
-        <i class="fa-solid fa-trash"></i>
-        <i class="fa-solid fa-plus"></i>
-    </div>
+<div class="role-tabs" id="roleTabs">
+  <div class="role-tab active" data-role="ceo">
+    <div class="level">Quyền cấp 5</div>
+    <div class="name">Đài Kiểm Soát Tối Cao</div>
+    <div class="desc">Góc nhìn CEO / Admin</div>
+  </div>
+  <div class="role-tab" data-role="leader">
+    <div class="level">Quyền cấp 3</div>
+    <div class="name">Bàn Tác Chiến</div>
+    <div class="desc">Góc nhìn Leader / Quản lý</div>
+  </div>
+  <div class="role-tab" data-role="staff">
+    <div class="level">Quyền cấp 2</div>
+    <div class="name">Không Gian Flow</div>
+    <div class="desc">Góc nhìn Nhân viên</div>
+  </div>
 </div>
-                    </div>
-                    
-                    <div class="shot-desc-area" onclick="event.stopPropagation()">
-                        <div class="desc-line">
-                            <div style="display:flex; gap:10px; flex:1;">
-                                <span class="label-fix">Shot Description:</span>
-                                <div class="desc-val-display">@Close up of feet walking on dry leaves...</div>
-                            </div>
-                            <i class="fa-solid fa-pen-to-square" style="color:#666; cursor:pointer;" onclick="openEdit(this)"></i>
-                        </div>
-                        <div class="edit-box">
-                            <textarea class="desc-textarea">@Close up of feet walking on dry leaves...</textarea>
-                            <div style="display:flex; justify-content:flex-end;"><button class="btn-confirm" onclick="confirmEdit(this)">Confirm</button></div>
-                        </div>
-                    </div>
-                </div>
-				
-				
-				
-            </div>
-			
-			
-        </div>
-	<div class="scene-card">
-            <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
-                <strong>Scene2: INT.SOUNDPROOF ROOM-DAY</strong>
-                <div style="display:flex; gap:15px; color:#666; cursor:pointer;">
-                    <i class="fa-solid fa-expand"></i>
-                    <i class="fa-solid fa-pen-to-square"></i>
-                    <i class="fa-solid fa-copy"></i>
-                    <i class="fa-solid fa-trash"></i>
-                </div>
-            </div>
 
-            <div class="shot-group">
-                <div class="shot-item">
-                    <div class="shot-main-row" onclick="handleShotClick(this)">
-                        <div class="shot-dot"></div>
-                        <span class="shot-label">Shot 1</span>
-                         <div class="subtitle-line" onclick="activateRow(this)" style="position: relative; display: flex; align-items: center; padding: 10px 0;">
-    <span class="label-fix">Subtitles:</span>
-    <input type="text" class="sub-input" value="Nội dung kịch bản..." style="flex: 1; background: transparent; border: none; color: white;" onclick="event.stopPropagation()">
+<!-- ================= GENERATIVE CANVAS ================= -->
 
-    <div class="extra-icons" style="display: flex; align-items: center;">
-        <span class="char-count">100/200</span>
-        <i class="fa-solid fa-copy"></i>
-        <i class="fa-solid fa-trash"></i>
-        <i class="fa-solid fa-plus"></i>
-    </div>
+<div id="canvas"></div>
 
-    <div class="mobile-more-btn" onclick="toggleMobileMenu(this, event)">...</div>
+<div class="disclaimer">MÔ PHỎNG KHÁI NIỆM — GIAO DIỆN ĐƯỢC "SINH" LẠI THEO Ý ĐỊNH & VAI TRÒ, KHÔNG DÙNG MENU CỐ ĐỊNH</div>
 
-    <div class="mobile-tools-popup">      
-        <i class="fa-solid fa-copy"></i>
-        <i class="fa-solid fa-trash"></i>
-        <i class="fa-solid fa-plus"></i>
-    </div>
 </div>
-                    </div>
-                    
-                    <div class="shot-desc-area" onclick="event.stopPropagation()">
-                        <div class="desc-line">
-                            <div style="display:flex; gap:10px; flex:1;">
-                                <span class="label-fix">Shot Description:</span> 
-                                <div class="desc-val-display">@Wide shot of the forest floor, shadows moving...</div>
-                            </div>
-                            <i class="fa-solid fa-pen-to-square" style="color:#666; cursor:pointer;" onclick="openEdit(this)"></i>
-                        </div>
-                        <div class="edit-box">
-                            <textarea class="desc-textarea">@Wide shot of the forest floor, shadows moving...</textarea>
-                            <div style="display:flex; justify-content:flex-end;"><button class="btn-confirm" onclick="confirmEdit(this)">Confirm</button></div>
-                        </div>
-                    </div>
-                </div>
 
-                <div class="shot-item">
-                    <div class="shot-main-row" onclick="handleShotClick(this)">
-                        <div class="shot-dot"></div>
-                        <span class="shot-label">Shot 2</span>
-                         <div class="subtitle-line" onclick="activateRow(this)" style="position: relative; display: flex; align-items: center; padding: 10px 0;">
-    <span class="label-fix">Subtitles:</span>
-    <input type="text" class="sub-input" value="Nội dung kịch bản..." style="flex: 1; background: transparent; border: none; color: white;" onclick="event.stopPropagation()">
+<script>
 
-    <div class="extra-icons" style="display: flex; align-items: center;">
-        <span class="char-count">100/200</span>
-        <i class="fa-solid fa-copy"></i>
-        <i class="fa-solid fa-trash"></i>
-        <i class="fa-solid fa-plus"></i>
+const canvas = document.getElementById('canvas');
+const chipRow = document.getElementById('chipRow');
+const cmdInput = document.getElementById('cmdInput');
+
+/* -------- clock -------- */
+function tick(){
+  document.getElementById('clock').textContent = new Date().toLocaleTimeString('vi-VN');
+}
+tick(); setInterval(tick,1000);
+
+/* -------- role templates -------- */
+
+const chips = {
+  ceo:['Dòng tiền tháng này','Burn rate quý','Phân tích chiến lược','Tổng quan nhân sự'],
+  leader:['Điểm nghẽn tuần này','Phân bổ nguồn lực','Rủi ro tiến độ','Xem bàn tác chiến'],
+  staff:['Việc hôm nay','Tài liệu tham khảo','Soạn AI hợp đồng','Bật Deep Work']
+};
+
+function renderCeo(){
+  return `
+  <div class="panel fade-in">
+    <div class="panel-head"><h3>📡 Tổng quan vĩ mô</h3><span class="tag">Real-time · Cấp 5</span></div>
+    <div class="stat-grid">
+      <div class="stat"><div class="label">Dòng tiền hiện tại</div><div class="value">+4.82 tỷ ₫</div><div class="delta up">▲ 6 tháng liên tiếp dương</div></div>
+      <div class="stat"><div class="label">Burn rate / tháng</div><div class="value">1.15 tỷ ₫</div><div class="delta down">▼ 3.2% so với KH</div></div>
+      <div class="stat"><div class="label">Tiến độ mục tiêu Q3</div><div class="value">78%</div><div class="delta up">▲ đúng lộ trình</div></div>
+      <div class="stat"><div class="label">Doanh thu tháng</div><div class="value">12.4 tỷ ₫</div><div class="delta up">▲ 8.2%</div></div>
+    </div>
+  </div>
+
+  <div class="cols-2 fade-in">
+    <div class="panel">
+      <div class="panel-head"><h3>Dòng tiền 6 tháng</h3><span class="tag">AI Analytics</span></div>
+      <div class="bars" id="ceoBars">
+        <div class="bar" style="height:52%"></div>
+        <div class="bar" style="height:60%"></div>
+        <div class="bar" style="height:68%"></div>
+        <div class="bar" style="height:63%"></div>
+        <div class="bar" style="height:82%"></div>
+        <div class="bar" style="height:96%"></div>
+      </div>
+      <div class="bar-labels"><div>Th1</div><div>Th2</div><div>Th3</div><div>Th4</div><div>Th5</div><div>Th6</div></div>
+      <div class="ai-note" id="ceoNote"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><h3>Quyền hạn Cấp 5</h3></div>
+      <ul class="perm-list">
+        <li>Toàn quyền hệ thống (Superuser)</li>
+        <li>Cài đặt luồng tự động & mức can thiệp của AI</li>
+        <li>Phân bổ ngân sách AI cho toàn công ty</li>
+        <li>Tài khoản duy nhất được phê duyệt xóa dữ liệu vĩnh viễn</li>
+      </ul>
+    </div>
+  </div>
+
+  ${wfPanelHTML()}`;
+}
+
+function renderLeader(){
+  return `
+  <div class="panel fade-in">
+    <div class="alert-banner">
+      <span class="ico">⚠</span>
+      <div><b>Nguy cơ chậm trễ:</b> Dự án "Nội thất Villa Q7" đang trễ 2 ngày so với mốc bàn giao. AI đề xuất chuyển 1 nhân sự từ dự án B sang hỗ trợ trong 48h tới.</div>
+    </div>
+  </div>
+
+  <div class="panel fade-in">
+    <div class="panel-head"><h3>🗂 Bàn tác chiến</h3><span class="tag">Cấp 3 · Nhóm 6 người</span></div>
+    <div class="kanban">
+      <div class="kcol"><h5>Chờ xử lý</h5>
+        <div class="kcard">Duyệt BOQ khách hàng D.</div>
+        <div class="kcard">Chuẩn bị hồ sơ nghiệm thu</div>
+      </div>
+      <div class="kcol"><h5>Đang làm</h5>
+        <div class="kcard risk">Thi công nội thất Villa Q7<div class="risk-tag">⚠ Nguy cơ trễ</div></div>
+        <div class="kcard">Lắp đặt hệ thống điện tầng 2</div>
+      </div>
+      <div class="kcol"><h5>Chờ duyệt</h5>
+        <div class="kcard">Báo giá vật tư tháng 7</div>
+      </div>
+      <div class="kcol"><h5>Hoàn thành</h5>
+        <div class="kcard">Bàn giao căn A12</div>
+        <div class="kcard">Quyết toán hợp đồng B04</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel fade-in">
+    <div class="panel-head"><h3>Phân bổ nguồn lực</h3><span class="tag">Tải công việc hiện tại</span></div>
+    <div class="workload">
+      <div class="row"><span>Minh Anh</span><div class="wtrack"><div class="wfill" style="width:88%"></div></div><span>88%</span></div>
+      <div class="row"><span>Quốc Huy</span><div class="wtrack"><div class="wfill" style="width:64%"></div></div><span>64%</span></div>
+      <div class="row"><span>Thu Trang</span><div class="wtrack"><div class="wfill" style="width:95%"></div></div><span>95%</span></div>
+      <div class="row"><span>Đức Long</span><div class="wtrack"><div class="wfill" style="width:41%"></div></div><span>41%</span></div>
+    </div>
+  </div>`;
+}
+
+function renderStaff(){
+  return `
+  <div class="flow-wrap fade-in">
+    <div class="flow-card">
+      <div class="eyebrow">Nhiệm vụ duy nhất hôm nay</div>
+      <h2>Hoàn thiện bản vẽ chi tiết phòng khách — Villa Q7</h2>
+      <p>Tài liệu tham khảo và dữ liệu liên quan đã được AI lọc sẵn. Không có thông báo nào khác xuất hiện trong khung giờ tập trung.</p>
+      <button class="focus-btn" id="focusBtn">Bắt đầu Deep Work — 90 phút</button>
     </div>
 
-    <div class="mobile-more-btn" onclick="toggleMobileMenu(this, event)">...</div>
-
-    <div class="mobile-tools-popup">      
-        <i class="fa-solid fa-copy"></i>
-        <i class="fa-solid fa-trash"></i>
-        <i class="fa-solid fa-plus"></i>
-    </div>
-</div>
-                    </div>
-                    
-                    <div class="shot-desc-area" onclick="event.stopPropagation()">
-                        <div class="desc-line">
-                            <div style="display:flex; gap:10px; flex:1;">
-                                <span class="label-fix">Shot Description:</span>
-                                <div class="desc-val-display">@Close up of feet walking on dry leaves...</div>
-                            </div>
-                            <i class="fa-solid fa-pen-to-square" style="color:#666; cursor:pointer;" onclick="openEdit(this)"></i>
-                        </div>
-                        <div class="edit-box">
-                            <textarea class="desc-textarea">@Close up of feet walking on dry leaves...</textarea>
-                            <div style="display:flex; justify-content:flex-end;"><button class="btn-confirm" onclick="confirmEdit(this)">Confirm</button></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-			
-			
-        </div>
-		
-		
-    </main>
-
-    <footer class="footer-bar">
-        <button id="btn-back" class="btn-back" onclick="handleBack()">Back</button>
-        <button class="btn-next" onclick="handleNext()">Next Step</button>
-    </footer>
-
-    <div id="ai-modal" class="ai-modal-overlay">
-        <div class="ai-modal-content">
-            <div class="ai-modal-header">
-                <strong style="color: var(--accent-yellow);">AI Expansion Result</strong>
-                <i class="fa-solid fa-xmark" style="cursor:pointer; color:#888;" onclick="closeAIModal()"></i>
-            </div>
-            <div class="ai-modal-body">
-                <textarea id="ai-result-text">Đây là nội dung kịch bản được mở rộng bởi AI...</textarea>
-            </div>
-            <div class="ai-modal-footer">
-                <button class="btn-ai-cancel" onclick="closeAIModal()">Cancel</button>
-                <button class="btn-ai-apply" onclick="applyAIResult()">Apply Result</button>
-            </div>
-        </div>
+    <div class="ref-docs">
+      <div class="ref-doc">📄 BOQ Villa Q7 (v3)</div>
+      <div class="ref-doc">📐 Bản vẽ mặt bằng gốc</div>
+      <div class="ref-doc">🧾 Yêu cầu khách hàng (audio → text)</div>
     </div>
 
-    <div id="video-modal" class="modal">
-        <div class="modal-box" style="max-width:800px; background:#000;">
-            <span class="close-x" onclick="closeModal('video-modal')">&times;</span>
-            <div style="padding-top:20px;">
-                <iframe width="100%" height="350" src="https://www.youtube.com/embed/dQw4w9WgXcQ" frameborder="0" allowfullscreen></iframe>
-                <div class="video-info">
-                    <h3 id="v-title" style="color:var(--accent-yellow); margin-bottom:10px;"></h3>
-                    <p id="v-script" style="color:#aaa; font-size:13px; line-height:1.5;"></p>
-                </div>
-            </div>
-        </div>
+    <div class="quiet-note">Quyền cấp 2: chỉ thao tác trên dữ liệu do chính bạn tạo ra · AI dùng cho tác vụ hàng ngày, không xem được ngân sách tổng hoặc dữ liệu nhóm khác.</div>
+  </div>`;
+}
+
+const renderers = {ceo:renderCeo, leader:renderLeader, staff:renderStaff};
+
+/* ================= ORG CHART + WORKFLOW & PERMISSION BUILDER ================= */
+
+const approverOpts = [
+  {key:'staff', label:'C2·Staff'},
+  {key:'leader', label:'C3·Leader'},
+  {key:'manager', label:'C4·Manager'},
+  {key:'ceo', label:'C5·CEO'}
+];
+
+const autonomyOpts = [
+  {key:'support', label:'Hỗ trợ'},
+  {key:'monitor', label:'Giám sát'},
+  {key:'full', label:'Toàn quyền'}
+];
+
+const wfTemplates = {
+  mwf0:{
+    label:'M-WF 0 · Vận hành 5 Trạm',
+    nodes:[
+      {dept:'Kinh doanh', title:'Tiếp nhận & xác nhận đơn hàng', approver:'staff', autonomy:'support', sensitive:false},
+      {dept:'Kinh doanh', title:'Lập báo giá & duyệt giá', approver:'manager', autonomy:'monitor', sensitive:true},
+      {dept:'Sản xuất', title:'Lên kế hoạch & thi công', approver:'leader', autonomy:'monitor', sensitive:false},
+      {dept:'Kho vận', title:'Giám sát giao nhận hiện trường', approver:'leader', autonomy:'full', sensitive:false},
+      {dept:'Tài chính', title:'Thu tiền & quyết toán', approver:'manager', autonomy:'monitor', sensitive:true}
+    ]
+  },
+  mwf2:{
+    label:'M-WF 2 · Xử lý khủng hoảng',
+    nodes:[
+      {dept:'Vận hành', title:'Phát hiện sự cố bất thường', approver:'staff', autonomy:'full', sensitive:false},
+      {dept:'Quản lý', title:'Đánh giá mức độ khủng hoảng', approver:'leader', autonomy:'monitor', sensitive:false},
+      {dept:'Pháp lý', title:'Rà soát rủi ro pháp lý', approver:'manager', autonomy:'support', sensitive:true},
+      {dept:'CEO', title:'Ra quyết định xử lý cuối cùng', approver:'ceo', autonomy:'support', sensitive:true}
+    ]
+  },
+  mwf5:{
+    label:'M-WF 5 · Master DB giá mua vào',
+    nodes:[
+      {dept:'Thu mua', title:'Cập nhật giá mua vào từ NCC', approver:'staff', autonomy:'full', sensitive:false},
+      {dept:'Thu mua', title:'Đối chiếu thời gian giao & bảo hành', approver:'leader', autonomy:'monitor', sensitive:false},
+      {dept:'Tài chính', title:'Xác nhận vào Master Database', approver:'manager', autonomy:'monitor', sensitive:true}
+    ]
+  }
+};
+
+let wfCurrentKey = 'mwf0';
+let wfNodes = wfTemplates.mwf0.nodes.map(n=>({...n}));
+
+let orgDepartments = [
+  {name:'Kinh doanh', head:''},
+  {name:'Sản xuất', head:''},
+  {name:'Kho vận', head:''},
+  {name:'Tài chính', head:''},
+  {name:'Nhân sự', head:''}
+];
+
+const orgPresets = [
+  {keys:['nội thất','xây dựng','thi công','villa','nhà xưởng'], depts:['Kinh doanh','Thiết kế','Sản xuất','Kho vận','Tài chính','Nhân sự']},
+  {keys:['nhà hàng','quán ăn','f&b','ẩm thực','cà phê','cafe'], depts:['Bếp','Phục vụ','Kho nguyên liệu','Kế toán','Marketing']},
+  {keys:['thương mại điện tử','ecommerce','bán hàng online','sàn'], depts:['Vận hành sàn','Kho & Đóng gói','CSKH','Marketing','Tài chính']},
+  {keys:['sản xuất','nhà máy','gia công'], depts:['Kế hoạch sản xuất','Kho nguyên vật liệu','QC/QA','Bảo trì thiết bị','Tài chính']},
+  {keys:['dịch vụ','tư vấn','agency'], depts:['Kinh doanh','Chuyên môn/Tư vấn','Chăm sóc khách hàng','Tài chính','Nhân sự']}
+];
+
+function generateOrgFromPrompt(text){
+  const t = text.toLowerCase();
+  const hit = orgPresets.find(p=> p.keys.some(k=> t.includes(k)));
+  const list = hit ? hit.depts : ['Kinh doanh','Vận hành','Tài chính','Nhân sự'];
+  return list.map(name=>({name, head:''}));
+}
+
+function orgCardHTML(d,i){
+  return `
+  <div class="org-card" draggable="true" data-idx="${i}">
+    <button class="org-remove" data-idx="${i}" title="Xóa phòng ban">×</button>
+    <input class="org-name" data-idx="${i}" value="${d.name}" placeholder="Tên phòng ban">
+    <input class="org-head" data-idx="${i}" value="${d.head||''}" placeholder="Trưởng phòng (tùy chọn)">
+  </div>`;
+}
+
+function orgGridHTML(){
+  return orgDepartments.map((d,i)=>orgCardHTML(d,i)).join('');
+}
+
+function orgPanelHTML(){
+  return `
+  <div class="panel fade-in org-panel">
+    <div class="panel-head"><h3>🏢 Sơ đồ tổ chức doanh nghiệp</h3><span class="tag">Cấp 5 · Nền tảng cho luồng công việc</span></div>
+    <p class="wf-desc">Vẽ trước bộ phòng ban của công ty — kéo thẻ phòng ban bên dưới thả vào luồng công việc ở panel kế tiếp để tạo trạm mới. Có thể để AI tạo nhanh danh sách phòng ban dựa trên mô tả doanh nghiệp.</p>
+    <div class="org-ai-row">
+      <span class="prompt" style="color:var(--cyan);font-family:var(--mono);font-size:14px;">✨</span>
+      <input id="orgPromptInput" placeholder="Mô tả doanh nghiệp của bạn… VD: công ty nội thất, 40 nhân sự">
+      <button class="cmd-btn send" id="orgGenBtn">AI tạo phòng ban</button>
     </div>
+    <div class="ai-note" id="orgAiNote" style="display:none;"></div>
+    <div class="org-grid" id="orgGrid">${orgGridHTML()}</div>
+    <button class="add-dept-btn" id="addDeptBtn">+ Thêm phòng ban</button>
+  </div>`;
+}
 
-    <script>
-        function openAI() { document.getElementById('ai-modal').style.display = 'flex'; }
-        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-        function confirmAI() { 
-            document.getElementById('main-script').value = document.getElementById('ai-res').innerText; 
-            closeModal('ai-modal'); 
-        }
+function segGroupHTML(field, options, activeKey){
+  return `<div class="seg-group" data-field="${field}">
+    ${options.map(o=>`<button class="seg-btn ${field==='autonomy'?'auto-'+o.key:''} ${o.key===activeKey?'active':''}" data-key="${o.key}">${o.label}</button>`).join('')}
+  </div>`;
+}
 
-        function watchVideo(title, script) { 
-            document.getElementById('v-title').innerText = title; 
-            document.getElementById('v-script').innerText = script;
-            document.getElementById('video-modal').style.display = 'flex'; 
-        }
+function deptOptionsHTML(currentDept){
+  const names = orgDepartments.map(d=>d.name);
+  if(!names.includes(currentDept)) names.unshift(currentDept);
+  return names.map(n=>`<option value="${n}" ${n===currentDept?'selected':''}>${n}</option>`).join('');
+}
 
-        function runScript(txt) { document.getElementById('main-script').value = txt; }
-        function setStyle(el) { document.querySelectorAll('.style-item').forEach(i => i.classList.remove('selected')); el.classList.add('selected'); }
-        function setDuration(el) { document.querySelectorAll('.dur-btn').forEach(b => b.classList.remove('active')); el.classList.add('active'); }
-        function setRatio(el) { document.querySelectorAll('.ratio-card').forEach(c => c.classList.remove('active')); el.classList.add('active'); }
-        function toggleIcon(el) { el.classList.toggle('selected'); }
+function wfNodeHTML(n, idx){
+  return `
+  <div class="wf-node" draggable="true" data-idx="${idx}">
+    <button class="wf-node-remove" data-idx="${idx}" title="Xóa trạm">×</button>
+    <select class="wf-node-dept-select" data-idx="${idx}">${deptOptionsHTML(n.dept)}</select>
+    <input class="wf-node-title" data-idx="${idx}" value="${n.title}">
+    <div class="wf-field">
+      <div class="wf-field-label">Cấp phê duyệt</div>
+      ${segGroupHTML('approver', approverOpts, n.approver)}
+    </div>
+    <div class="wf-field">
+      <div class="wf-field-label">Mức AI tự quyết</div>
+      ${segGroupHTML('autonomy', autonomyOpts, n.autonomy)}
+    </div>
+    ${n.sensitive ? '<label class="wf-human-loop">⚠ Bắt buộc phê duyệt 1-click</label>' : ''}
+  </div>`;
+}
 
-        function clickShot(el) {
-            const desc = el.nextElementSibling;
-            const tools = el.querySelector('.shot-tools');
-            const isVisible = desc.style.display === 'block';
-            if(!isVisible) {
-                desc.style.display = 'block';
-                tools.style.display = 'flex';
-            }
-        }
+function wfFlowHTML(){
+  return wfNodes.map((n,i)=> wfNodeHTML(n,i) + (i<wfNodes.length-1 ? '<div class="wf-arrow"><span class="wf-arrow-dot"></span>→</div>' : '')).join('')
+    + '<button class="add-station-btn" id="addStationBtn">+ Thêm<br>trạm</button>';
+}
 
-        function cancelShot(btn) {
-            const descBox = btn.closest('.shot-desc');
-            const row = descBox.previousElementSibling;
-            descBox.style.display = 'none';
-            row.querySelector('.shot-tools').style.display = 'none';
-        }
+function wfPanelHTML(){
+  return `
+  <div class="panel fade-in wf-panel">
+    <div class="panel-head"><h3>🔧 Xây dựng Luồng & Phân quyền</h3><span class="tag">Cấp 5 · Cài đặt luồng tự động</span></div>
+    <p class="wf-desc">Chọn mẫu luồng có sẵn, hoặc kéo thẻ phòng ban từ sơ đồ tổ chức phía trên thả vào đây để tạo trạm mới. Gán cấp phê duyệt và mức AI tự quyết cho từng trạm — khi kích hoạt, N8N sẽ đóng vai "hệ thần kinh trung gian" tự chuyển tiếp giữa các trạm.</p>
+    <div class="wf-templates" id="wfTemplates">
+      ${Object.keys(wfTemplates).map(k=>`<div class="chip wf-template-chip ${k===wfCurrentKey?'active':''}" data-key="${k}">${wfTemplates[k].label}</div>`).join('')}
+    </div>
+    <div class="wf-flow" id="wfFlow">${wfFlowHTML()}</div>
+    <div class="wf-status-row">
+      <div class="wf-status" id="wfStatus"><span class="dot" id="wfDot" style="background:var(--text-faint)"></span> Trạng thái: <b id="wfStatusText">Chưa kích hoạt</b></div>
+      <button class="cmd-btn send" id="wfActivateBtn">⚙ Kích hoạt luồng tự động</button>
+    </div>
+  </div>`;
+}
 
-        function confirmShot(btn) {
-            const descBox = btn.closest('.shot-desc');
-            const textarea = descBox.querySelector('textarea');
-            const row = descBox.previousElementSibling;
-            row.querySelector('.sub-input').value = textarea.value;
-            descBox.style.display = 'none';
-            row.querySelector('.shot-tools').style.display = 'none';
-        }
+/* -------- org events -------- */
 
-        /* --- CẬP NHẬT LOGIC HANDLE NEXT --- */
-        function handleNext() {
-            // Nếu đang ở Page 1 (Content)
-            if(document.getElementById('page-1').style.display !== 'none') {
-                document.getElementById('page-1').style.display = 'none';
-                document.getElementById('page-synopsis').style.display = 'block';
-                document.getElementById('btn-back').style.display = 'block';
-                document.getElementById('synopsis-desc').innerText = document.getElementById('main-script').value || "Mô tả synopsis mặc định...";
-                window.scrollTo(0,0);
-            } 
-            // Nếu đang ở trang Synopsis
-            else if (document.getElementById('page-synopsis').style.display === 'block') {
-                // CHUYỂN HƯỚNG SANG FILE CAST.HTML
-                window.location.href = 'cast.html';
-            }
-        }
+function initOrgEvents(){
+  const grid = document.getElementById('orgGrid');
+  const addBtn = document.getElementById('addDeptBtn');
+  const genBtn = document.getElementById('orgGenBtn');
+  const promptInput = document.getElementById('orgPromptInput');
+  if(!grid) return;
 
-        function handleBack() {
-            document.getElementById('page-1').style.display = 'grid';
-            document.getElementById('page-synopsis').style.display = 'none';
-            document.getElementById('btn-back').style.display = 'none';
-            window.scrollTo(0,0);
-        }
-    </script>
-	<script>
-        // JS CHO SYNOPSIS
-        function handleShotClick(row) {
-            row.querySelector('.extra-icons').style.display = 'flex';
-            const area = row.parentElement.querySelector('.shot-desc-area');
-            area.style.display = 'block';
-            row.querySelector('.sub-input').style.pointerEvents = 'auto';
-        }
+  grid.addEventListener('click', e=>{
+    const rm = e.target.closest('.org-remove');
+    if(rm){ orgDepartments.splice(Number(rm.dataset.idx),1); renderOrgGrid(); refreshAllDeptSelects(); }
+  });
 
-        function openEdit(icon) {
-            const box = icon.closest('.shot-desc-area').querySelector('.edit-box');
-            box.style.display = (box.style.display === 'block') ? 'none' : 'block';
-        }
+  grid.addEventListener('input', e=>{
+    const idx = e.target.dataset.idx;
+    if(idx===undefined) return;
+    if(e.target.classList.contains('org-name')){ orgDepartments[idx].name = e.target.value; refreshAllDeptSelects(); }
+    if(e.target.classList.contains('org-head')){ orgDepartments[idx].head = e.target.value; }
+  });
 
-        function confirmEdit(btn) {
-            const area = btn.closest('.shot-desc-area');
-            area.querySelector('.desc-val-display').innerText = area.querySelector('textarea').value;
-            area.querySelector('.edit-box').style.display = 'none';
-        }
-    </script>
-	<script>
-        // SỬA LỖI EDIT Tên Project
-        function toggleEditProject() {
-            const input = document.getElementById('prj-title');
-            if (input.hasAttribute('readonly')) {
-                input.removeAttribute('readonly');
-                input.focus();
-                input.select(); 
-                
-                input.onblur = function() { input.setAttribute('readonly', 'true'); };
-                input.onkeydown = function(e) { if(e.key === 'Enter') input.blur(); };
-            }
-        }
-    </script>
-	<script>
-        function showAIResult() {
-            document.getElementById('ai-modal').style.display = 'flex';
-        }
+  grid.addEventListener('dragstart', e=>{
+    const card = e.target.closest('.org-card');
+    if(!card) return;
+    card.classList.add('drag-source');
+    e.dataTransfer.setData('text/plain', JSON.stringify({type:'department', name:orgDepartments[card.dataset.idx].name}));
+    e.dataTransfer.effectAllowed = 'copy';
+  });
 
-        function closeAIModal() {
-            document.getElementById('ai-modal').style.display = 'none';
-        }
+  grid.addEventListener('dragend', e=>{
+    const card = e.target.closest('.org-card');
+    if(card) card.classList.remove('drag-source');
+  });
 
-        function applyAIResult() {
-            const aiText = document.getElementById('ai-result-text').value;
-            const mainScript = document.getElementById('main-script');
-            if (mainScript) {
-                mainScript.value = aiText;
-                closeAIModal(); 
-            }
-        }
+  addBtn.addEventListener('click', ()=>{
+    orgDepartments.push({name:'Phòng mới', head:''});
+    renderOrgGrid();
+  });
 
-        window.onclick = function(event) {
-            const modal = document.getElementById('ai-modal');
-            if (event.target == modal) {
-                closeAIModal();
-            }
-        }
-    </script>
-	<script>
-        function switchTab(clickedTab) {
-            const tabs = document.querySelectorAll('.tab-btn');
-            tabs.forEach(tab => {
-                tab.classList.remove('active');
-            });
-            clickedTab.classList.add('active');
-            const scriptArea = document.getElementById('main-script');
-            if (clickedTab.innerText === 'Smart Script') {
-                scriptArea.placeholder = "Nhập kịch bản thông minh (AI hỗ trợ)...";
-            } else {
-                scriptArea.placeholder = "Nhập kịch bản cơ bản...";
-            }
-        }
-    </script>
-	<script>
-    // 1. Quản lý Row Synopsis
-    function activateRow(row) {
-        document.querySelectorAll('.subtitle-line').forEach(el => {
-            if (el !== row) {
-                el.classList.remove('active');
-                el.classList.remove('show-mobile-menu');
-            }
-        });
-        row.classList.add('active');
+  genBtn.addEventListener('click', ()=> runOrgGeneration(promptInput.value.trim()));
+  promptInput.addEventListener('keydown', e=>{ if(e.key==='Enter') runOrgGeneration(promptInput.value.trim()); });
+}
+
+function renderOrgGrid(){
+  const grid = document.getElementById('orgGrid');
+  if(grid) grid.innerHTML = orgGridHTML();
+}
+
+function runOrgGeneration(text){
+  if(!text) return;
+  const grid = document.getElementById('orgGrid');
+  const note = document.getElementById('orgAiNote');
+  grid.innerHTML = `<div class="skeleton skeleton-block" style="height:70px;grid-column:1/-1;"></div>`;
+  note.style.display = 'block';
+  note.innerHTML = '';
+  setTimeout(()=>{
+    orgDepartments = generateOrgFromPrompt(text);
+    renderOrgGrid();
+    refreshAllDeptSelects();
+    typeNote('orgAiNote', 'Đã tạo '+orgDepartments.length+' phòng ban dựa trên mô tả của bạn: '+orgDepartments.map(d=>d.name).join(', ')+'.');
+  }, 600);
+}
+
+function refreshAllDeptSelects(){
+  document.querySelectorAll('.wf-node-dept-select').forEach(sel=>{
+    const idx = sel.dataset.idx;
+    sel.innerHTML = deptOptionsHTML(wfNodes[idx].dept);
+  });
+}
+
+/* -------- workflow events -------- */
+
+function renderWfFlow(){
+  const flowEl = document.getElementById('wfFlow');
+  if(flowEl) flowEl.innerHTML = wfFlowHTML();
+}
+
+function initWfEvents(){
+  const templatesEl = document.getElementById('wfTemplates');
+  const flowEl = document.getElementById('wfFlow');
+  const activateBtn = document.getElementById('wfActivateBtn');
+  if(!templatesEl) return;
+
+  templatesEl.addEventListener('click', e=>{
+    const chip = e.target.closest('.wf-template-chip');
+    if(!chip) return;
+    wfCurrentKey = chip.dataset.key;
+    wfNodes = wfTemplates[wfCurrentKey].nodes.map(n=>({...n}));
+    templatesEl.querySelectorAll('.wf-template-chip').forEach(c=>c.classList.toggle('active', c===chip));
+    renderWfFlow();
+    resetWfStatus();
+  });
+
+  flowEl.addEventListener('click', e=>{
+    const rm = e.target.closest('.wf-node-remove');
+    if(rm){ wfNodes.splice(Number(rm.dataset.idx),1); renderWfFlow(); resetWfStatus(); return; }
+    const addStation = e.target.closest('#addStationBtn');
+    if(addStation){
+      wfNodes.push({dept: orgDepartments[0]?.name || 'Phòng mới', title:'Trạm mới', approver:'staff', autonomy:'support', sensitive:false});
+      renderWfFlow(); resetWfStatus(); return;
     }
-
-    function toggleMobileMenu(btn, event) {
-        event.stopPropagation(); 
-        const parent = btn.parentElement;
-        parent.classList.toggle('show-mobile-menu');
+    const btn = e.target.closest('.seg-btn');
+    if(btn){
+      const node = btn.closest('.wf-node');
+      const idx = Number(node.dataset.idx);
+      const field = btn.closest('.seg-group').dataset.field;
+      wfNodes[idx][field] = btn.dataset.key;
+      btn.closest('.seg-group').querySelectorAll('.seg-btn').forEach(b=>b.classList.toggle('active', b===btn));
     }
+  });
 
-    // 2. Click ra ngoài để thu gọn
-    document.addEventListener('click', function(e) {
-        if (!e.target.closest('.subtitle-line')) {
-            document.querySelectorAll('.subtitle-line').forEach(el => {
-                el.classList.remove('active');
-                el.classList.remove('show-mobile-menu');
-            });
-        }
-    });
+  flowEl.addEventListener('input', e=>{
+    const idx = e.target.dataset.idx;
+    if(idx===undefined) return;
+    if(e.target.classList.contains('wf-node-title')) wfNodes[idx].title = e.target.value;
+  });
+
+  flowEl.addEventListener('change', e=>{
+    if(e.target.classList.contains('wf-node-dept-select')) wfNodes[e.target.dataset.idx].dept = e.target.value;
+  });
+
+  flowEl.addEventListener('dragstart', e=>{
+    const node = e.target.closest('.wf-node');
+    if(!node) return;
+    e.dataTransfer.setData('text/plain', JSON.stringify({type:'reorder', idx:Number(node.dataset.idx)}));
+    e.dataTransfer.effectAllowed = 'move';
+  });
+
+  flowEl.addEventListener('dragover', e=>{
+    e.preventDefault();
+    flowEl.classList.add('drag-over');
+    document.querySelectorAll('#wfFlow .wf-node.drag-target').forEach(el=>el.classList.remove('drag-target'));
+    const over = e.target.closest('.wf-node');
+    if(over) over.classList.add('drag-target');
+  });
+
+  flowEl.addEventListener('dragleave', e=>{
+    if(e.target === flowEl) flowEl.classList.remove('drag-over');
+  });
+
+  flowEl.addEventListener('drop', e=>{
+    e.preventDefault();
+    flowEl.classList.remove('drag-over');
+    let data;
+    try{ data = JSON.parse(e.dataTransfer.getData('text/plain')||'{}'); }catch(err){ return; }
+    const overNode = e.target.closest('.wf-node');
+    const targetIdx = overNode ? Number(overNode.dataset.idx) : wfNodes.length;
+
+    if(data.type === 'reorder'){
+      const item = wfNodes.splice(data.idx,1)[0];
+      let insertAt = targetIdx;
+      if(data.idx < targetIdx) insertAt--;
+      wfNodes.splice(insertAt,0,item);
+    } else if(data.type === 'department'){
+      wfNodes.splice(targetIdx,0,{dept:data.name, title:'Trạm mới', approver:'staff', autonomy:'support', sensitive:false});
+    }
+    renderWfFlow();
+    resetWfStatus();
+  });
+
+  activateBtn.addEventListener('click', ()=> runWfActivation());
+}
+
+function resetWfStatus(){
+  const dot = document.getElementById('wfDot');
+  const text = document.getElementById('wfStatusText');
+  if(!dot) return;
+  dot.className = 'dot';
+  dot.style.background = 'var(--text-faint)';
+  text.textContent = 'Chưa kích hoạt';
+  document.querySelectorAll('#wfFlow .wf-node, #wfFlow .wf-arrow').forEach(el=>el.classList.remove('active-pulse'));
+}
+
+function runWfActivation(){
+  const elements = document.querySelectorAll('#wfFlow .wf-node, #wfFlow .wf-arrow');
+  const text = document.getElementById('wfStatusText');
+  const dot = document.getElementById('wfDot');
+  text.textContent = 'Đang khởi tạo luồng qua N8N…';
+  elements.forEach(el=>el.classList.remove('active-pulse'));
+  elements.forEach((el,i)=> setTimeout(()=> el.classList.add('active-pulse'), 350*i));
+  setTimeout(()=>{
+    dot.classList.add('pulse');
+    dot.style.background = 'var(--green)';
+    text.textContent = 'Đang chạy tự động qua N8N';
+  }, 350*elements.length + 200);
+}
+
+/* -------- skeleton loader between states -------- */
+
+function showSkeleton(cb){
+  canvas.innerHTML = `
+    <div class="panel"><div class="skeleton skeleton-line" style="width:40%"></div>
+      <div class="skeleton skeleton-block"></div>
+    </div>
+    <div class="panel"><div class="skeleton skeleton-line" style="width:30%"></div>
+      <div class="skeleton skeleton-block" style="height:160px"></div>
+    </div>`;
+  setTimeout(cb, 550);
+}
+
+function mountRole(role){
+  showSkeleton(()=>{
+    canvas.innerHTML = renderers[role]();
+    if(role==='ceo'){ animateBars('ceoBars'); typeNote('ceoNote',
+      'Dòng tiền dương 6 tháng liên tiếp. Đề xuất: tái đầu tư ~20% lợi nhuận tháng 6 vào nâng công suất dây chuyền sản xuất số 2 trước cao điểm Q4.'); initWfEvents(); }
+    if(role==='staff'){
+      const btn = document.getElementById('focusBtn');
+      if(btn) btn.onclick = ()=>{ btn.textContent='🔒 Đang tập trung — thông báo đã tạm khóa'; btn.disabled=true; };
+    }
+  });
+}
+
+function animateBars(id){
+  const bars = document.querySelectorAll('#'+id+' .bar');
+  bars.forEach((b,i)=> setTimeout(()=> b.classList.add('show'), 120*i));
+}
+
+function typeNote(id,text){
+  const el = document.getElementById(id);
+  el.innerHTML = '';
+  let i=0;
+  const span = document.createElement('span');
+  el.appendChild(span);
+  const cursor = document.createElement('span');
+  cursor.className='cursor';
+  el.appendChild(cursor);
+  const interval = setInterval(()=>{
+    span.textContent = text.slice(0,i);
+    i++;
+    if(i>text.length){ clearInterval(interval); cursor.remove(); }
+  },14);
+}
+
+/* -------- role tab click -------- */
+
+document.querySelectorAll('.role-tab').forEach(tab=>{
+  tab.addEventListener('click', ()=>{
+    document.querySelectorAll('.role-tab').forEach(t=>t.classList.remove('active'));
+    tab.classList.add('active');
+    const role = tab.dataset.role;
+    renderChips(role);
+    mountRole(role);
+  });
+});
+
+function renderChips(role){
+  chipRow.innerHTML = chips[role].map(c=>`<div class="chip">${c}</div>`).join('');
+  document.querySelectorAll('.chip').forEach(chip=>{
+    chip.addEventListener('click', ()=>{ cmdInput.value = chip.textContent; sendCommand(); });
+  });
+}
+
+/* -------- AI command intent simulation -------- */
+
+const intents = [
+  {keys:['dòng tiền','cash'], title:'Dòng tiền', body:'Dòng tiền tháng hiện tại đạt +4.82 tỷ ₫, tăng liên tục 6 tháng. AI khuyến nghị giữ tỷ lệ dự phòng ở mức 15% trước khi mở rộng dây chuyền mới.'},
+  {keys:['burn rate','burn'], title:'Burn Rate', body:'Burn rate tháng này là 1.15 tỷ ₫, thấp hơn kế hoạch 3.2%. Với tốc độ hiện tại, runway còn khoảng 14 tháng.'},
+  {keys:['chiến lược'], title:'Đề xuất chiến lược', body:'AI phân tích: nên ưu tiên mở rộng kênh phân phối miền Trung trong Q4, nơi biên lợi nhuận cao hơn 12% so với trung bình.'},
+  {keys:['nhân sự','burnout'], title:'Sức khỏe nhân sự', body:'Burnout Radar phát hiện 2 nhân sự (Thu Trang, Minh Anh) làm việc ngoài giờ liên tục > 5 ngày. Đề xuất giảm tải hoặc phân bổ lại task.'},
+  {keys:['điểm nghẽn','tác chiến','nguồn lực'], title:'Điểm nghẽn vận hành', body:'Điểm nghẽn hiện tại: dự án Villa Q7 trễ 2 ngày do thiếu nhân sự thi công điện. AI đã đề xuất phương án điều chuyển ở bảng tác chiến bên dưới.'},
+  {keys:['rủi ro'], title:'Dự phóng rủi ro', body:'3 dự án có rủi ro phát sinh chi phí > 8% trong 30 ngày tới, chủ yếu do biến động giá vật tư đầu vào.'},
+  {keys:['việc hôm nay','deep work'], title:'Nhiệm vụ hôm nay', body:'Bạn có 1 nhiệm vụ trọng tâm hôm nay. AI đã lọc sẵn 3 tài liệu liên quan và tạm khóa thông báo không cần thiết.'},
+  {keys:['tài liệu'], title:'Tài liệu tham khảo', body:'AI đã lọc 3 tài liệu liên quan trực tiếp đến nhiệm vụ hiện tại, sắp xếp theo mức độ liên quan giảm dần.'},
+  {keys:['soạn ai','hợp đồng','soạn thảo'], title:'AI soạn thảo', body:'Đang soạn dự thảo phụ lục hợp đồng dựa trên dữ liệu chuẩn của công ty… Bản nháp sẽ sẵn sàng để bạn xem trong vài giây.'},
+];
+
+function findIntent(text){
+  const t = text.toLowerCase();
+  return intents.find(it => it.keys.some(k=>t.includes(k)));
+}
+
+function sendCommand(){
+  const text = cmdInput.value.trim();
+  if(!text) return;
+  const match = findIntent(text) || {title:'Yêu cầu của bạn', body:'AI đã ghi nhận yêu cầu: "'+text+'". Đây là bản mô phỏng khái niệm nên phản hồi được đơn giản hóa — trong hệ thống thật, Router Agent sẽ chọn widget phù hợp và sinh giao diện theo thời gian thực.'};
+
+  const card = document.createElement('div');
+  card.className='panel fade-in';
+  card.innerHTML = `
+    <div class="panel-head"><h3>🤖 ${match.title}</h3><span class="tag">Router Agent · vừa xong</span></div>
+    <div class="ai-note" id="cmdNote"></div>`;
+  canvas.prepend(card);
+  typeNote('cmdNote', match.body);
+  cmdInput.value='';
+}
+
+document.getElementById('sendBtn').addEventListener('click', sendCommand);
+cmdInput.addEventListener('keydown', e=>{ if(e.key==='Enter') sendCommand(); });
+
+/* -------- init -------- */
+
+renderChips('ceo');
+mountRole('ceo');
+
 </script>
+
 </body>
 </html>
